@@ -33,7 +33,7 @@ namespace Pepperi.Demo.Console
                 }
                 else
                 {
-                    return ApiBaseUriFromTokenOrOauth;
+                    return ApiBaseUriFromTokenOrOauth + "/v1.0/";
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace Pepperi.ModelGenerator
                 }
                 else
                 {
-                    return ApiBaseUriFromTokenOrOauth;
+                    return ApiBaseUriFromTokenOrOauth + "/v1.0/";
                 }
             }
         }
