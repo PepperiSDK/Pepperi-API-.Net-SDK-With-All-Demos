@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Pepperi.SDK.Model.Transaction>
+
+
+@{
+    int page = ViewBag.page;
+    int page_size = ViewBag.page_size;
+    DateTime FromDate = ViewBag.FromDate;
+    DateTime ToDate = ViewBag.ToDate;
+}
+
+
+@{
+    ViewBag.Title = "Transactions";
+}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+  $( function() {
+      $("#FromDate").datepicker();
+      $("#ToDate").datepicker();
+
+  } );
+</script>
+
+
+@using (Html.BeginForm("Transactions", "Transaction", FormMethod.Get)) //triger call to get first page
+{
+  <p>From: <input type="text" name="FromDate" id="FromDate" value="@FromDate.ToShortDateString()"> To: <input type="text" name="ToDate" id="ToDate" value="@ToDate.ToShortDateString()"></p>
+
+   <input type="submit" value="Search" />
+}
+
+
+<table>
+    <tr>
+        <th>
+            Wrnty ID
+        </th>
+        <th>
+            External ID
+        </th>
+        <th>
+            Creation Date Time
+        </th>
+        <th>
+            Grand Total
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var transaction in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.InternalID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.ExternalID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.CreationDateTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.GrandTotal)
+        </td>
+        <td>
+            @Html.ActionLink("Transaction Lines", "TransactionLines", new { InternalID =  @transaction.InternalID }) |
+
+        </td>
+    </tr>
+}
+
+</table>
+
+@if (page>1)                       {    @Html.ActionLink("<<", "Transactions", new { page= @page-1, page_size = page_size, FromDate =@FromDate, ToDate=@ToDate }) }
+
+@if (Model.Count() == page_size)   {    @Html.ActionLink(">>", "Transactions", new { page= @page+1, page_size = page_size, FromDate =@FromDate, ToDate=@ToDate }) }

@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9750ABF5-92C3-403B-BD2A-738DD4336FA9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Pepperi.SDK</RootNamespace>
+    <AssemblyName>Pepperi.SDK</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedDlls\newtonsoft_ver_4\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApiClient.cs" />
+    <Compile Include="BasicAuthentication.cs" />
+    <Compile Include="Contracts\IAuthentication.cs" />
+    <Compile Include="Contracts\ILogger.cs" />
+    <Compile Include="Endpoints\AccountCatalogsEndpoint.cs" />
+    <Compile Include="Endpoints\AccountInventoryEndpoint.cs" />
+    <Compile Include="Endpoints\AccountsEndpoint.cs" />
+    <Compile Include="Endpoints\AccountUsersEndpoint.cs" />
+    <Compile Include="Endpoints\ActivitiesEndpoint.cs" />
+    <Compile Include="Endpoints\Base\BaseEndpoint.cs" />
+    <Compile Include="Endpoints\CatalogsEndpoint.cs" />
+    <Compile Include="Endpoints\ContactsEndpoint.cs" />
+    <Compile Include="Endpoints\InventoryEndpoint.cs" />
+    <Compile Include="Endpoints\ItemsEndpoint.cs" />
+    <Compile Include="Endpoints\PriceListsEndpoint.cs" />
+    <Compile Include="Endpoints\SpecialPriceListsEndpoint.cs" />
+    <Compile Include="Endpoints\ItemPricesEndpoint.cs" />
+    <Compile Include="Endpoints\TransactionLinesEndpoint.cs" />
+    <Compile Include="Endpoints\TransactionsEndpoint.cs" />
+    <Compile Include="Endpoints\UserDefinedTablesEndpoint.cs" />
+    <Compile Include="Endpoints\UsersEndpoint.cs" />
+    <Compile Include="Endpoints\ItemDimensions1Endpoint.cs" />
+    <Compile Include="Endpoints\ItemDimensions2Endpoint.cs" />
+    <Compile Include="Exceptions\ApiException.cs" />
+    <Compile Include="Exceptions\PepperiException.cs" />
+    <Compile Include="Helpers\PepperiFlatSerializer.cs" />
+    <Compile Include="Helpers\PepperiHttpClient.cs" />
+    <Compile Include="Helpers\PepperiJsonSerializer.cs" />
+    <Compile Include="Helpers\PepperiLogger.cs" />
+    <Compile Include="Model\Account.cs" />
+    <Compile Include="Model\AccountCatalog.cs" />
+    <Compile Include="Model\AccountInventory.cs" />
+    <Compile Include="Model\AccountUser.cs" />
+    <Compile Include="Model\Activity.cs" />
+    <Compile Include="Model\Catalog.cs" />
+    <Compile Include="Model\Contact.cs" />
+    <Compile Include="Model\Fixed\BulkUploadResponse.cs" />
+    <Compile Include="Model\Fixed\Enums.cs" />
+    <Compile Include="Model\Fixed\FieldMetadata.cs" />
+    <Compile Include="Model\Fixed\GetBulkJobInfoResponse.cs" />
+    <Compile Include="Model\Fixed\Image.cs" />
+    <Compile Include="Model\Fixed\Reference.cs" />
+    <Compile Include="Model\Fixed\References.cs" />
+    <Compile Include="Model\Fixed\TypeMetadata.cs" />
+    <Compile Include="Model\Fixed\UserDefinedField.cs" />
+    <Compile Include="Model\Fixed\UserDefinedTable.cs" />
+    <Compile Include="Model\Inventory.cs" />
+    <Compile Include="Model\Item.cs" />
+    <Compile Include="Model\ItemDimensions1.cs" />
+    <Compile Include="Model\ItemDimensions2.cs" />
+    <Compile Include="Model\ItemPrice.cs" />
+    <Compile Include="Model\PriceList.cs" />
+    <Compile Include="Model\SpecialPriceList.cs" />
+    <Compile Include="Model\Transaction.cs" />
+    <Compile Include="Model\TransactionLine.cs" />
+    <Compile Include="Model\User.cs" />
+    <Compile Include="PrivateAuthentication.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublicAuthentication.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

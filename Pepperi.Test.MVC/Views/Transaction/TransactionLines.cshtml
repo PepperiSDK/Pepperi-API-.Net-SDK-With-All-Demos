@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Pepperi.SDK.Model.TransactionLine>
+
+@{
+    ViewBag.Title = "TransactionLines";
+}
+
+
+<table>
+    <tr>
+        <th>
+            Wrnty ID
+        </th>
+        <th>
+            Units Quantity
+        </th>
+        <th>
+            Unit Price
+        </th>
+        <th>
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var transaction in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.InternalID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.UnitsQuantity)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => transaction.UnitPrice)
+        </td>
+        <td>
+            
+        </td>
+        <td>
+        </td>
+    </tr>
+}
+
+</table>
+
