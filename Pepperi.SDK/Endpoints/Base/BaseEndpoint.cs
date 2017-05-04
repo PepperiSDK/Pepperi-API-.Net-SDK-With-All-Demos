@@ -377,6 +377,7 @@ namespace Pepperi.SDK.Endpoints.Base
             Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
             if (where != null) { dicQueryStringParameters.Add("where", where); }
             if (include_deleted.HasValue) { dicQueryStringParameters.Add("include_deleted", include_deleted.Value.ToString()); }
+            dicQueryStringParameters.Add("include_count", "true");
 
             dicQueryStringParameters.Add("page", "1");
             dicQueryStringParameters.Add("page_size", "1");
