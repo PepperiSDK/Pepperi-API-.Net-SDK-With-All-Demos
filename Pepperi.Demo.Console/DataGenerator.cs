@@ -168,7 +168,7 @@ namespace Pepperi.Demo.Console
         public GetBulkJobInfoResponse UploadAsBulk(IEnumerable<Item> models)
         {
             List<string> fieldsToUpload = new List<string>() { "ExternalID", "MainCategoryID", "UPC", "Name", "LongDescription", "Price", "Prop1", "Prop2", "Prop3" };
-            var BulkUploadResponse = ApiClient.Items.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Json, fieldsToUpload, true);
+            var BulkUploadResponse = ApiClient.Items.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true);
             GetBulkJobInfoResponse GetBulkJobInfoResponse = ApiClient.Items.WaitForBulkJobToComplete(BulkUploadResponse.JobID);
 
             //note: we do not validate result here 
