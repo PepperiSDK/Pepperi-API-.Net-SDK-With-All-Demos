@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepperi.Test.MVC", "Pepperi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepperi.Demo.Console", "Pepperi.Demo.Console\Pepperi.Demo.Console.csproj", "{44832286-07EC-4C1C-9D2C-35F1D62A57E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormSample", "Pepperi.Demo.WinForms\WinFormSample.csproj", "{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{44832286-07EC-4C1C-9D2C-35F1D62A57E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44832286-07EC-4C1C-9D2C-35F1D62A57E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44832286-07EC-4C1C-9D2C-35F1D62A57E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
