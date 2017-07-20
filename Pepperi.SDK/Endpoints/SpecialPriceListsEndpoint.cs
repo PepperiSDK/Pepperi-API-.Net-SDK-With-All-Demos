@@ -18,7 +18,7 @@ namespace Pepperi.SDK.Endpoints
         #region Constructor
 
         internal SpecialPriceListsEndpoint(string ApiBaseUri, IAuthentication Authentication, ILogger Logger) :
-            base(ApiBaseUri, Authentication, Logger,  "price_lists")
+            base(ApiBaseUri, Authentication, Logger,  "special_price_lists")
         {
         }
 
