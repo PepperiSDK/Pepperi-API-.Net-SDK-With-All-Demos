@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 
 namespace Pepperi.SDK.Exceptions
 {
-    //TODO: do we need it ?
+    /// <summary>
+    /// This is the excemtion returned by the SDK
+    /// </summary>
+    /// <usage>
+    /// 1. on SDK error
+    /// 2. when Api returns "Bad request" error with ApiExcprtion in the post body
+    /// 3.when Api returns any other http error, eg: 503.
+    /// </usage>
     public class PepperiException : Exception
     {
 
