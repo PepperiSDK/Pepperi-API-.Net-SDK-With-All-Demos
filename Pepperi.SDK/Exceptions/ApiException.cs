@@ -19,7 +19,7 @@ namespace Pepperi.SDK.Exceptions
     ///     http://stackoverflow.com/questions/3422703/how-to-deserialize-object-derived-from-exception-class-using-json-net-c/3423037#3423037
     /// </remarks>
     [Serializable]
-    public class ApiException : Exception
+    internal class ApiException : Exception
     {
         #region Properties
 

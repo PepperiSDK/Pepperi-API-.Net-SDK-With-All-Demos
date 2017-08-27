@@ -12,7 +12,23 @@ using System.Threading.Tasks;
 
 namespace Pepperi.Demo.Console
 {
+    //-if there is token print it
+    //-add: if api token is empty or null, immidiately prompt user,pass
+    //-progress
+    //-begining : skip genertion
+    //-add number of trasctions
+    //-see agent name works
+    //4. end: read and print transaciton in last 30 datys
 
+   
+    
+    //5. model generator: same beginig
+    //6. enter yes to generate model including user defined fields or no to generate without it
+
+    
+
+    //images
+    
     class Program
     {
         #region Properties
@@ -34,108 +50,116 @@ namespace Pepperi.Demo.Console
 
         static void Main(string[] args)
         {
-
-            #region Set ApiClient
-
-            ApiClient = Factory.CreateApiClientForPrivateApplication(Logger);
-
-            #endregion
-
-            #region Ask Should Generate And UploadData
-
-            bool ShouldGenerateAndUploadData = Ask_ShouldGenerateAndUploadData();
-
-            #endregion
-
-            #region read DataQuatities, Generate And upload Data
-
-            if (ShouldGenerateAndUploadData)
+            try
             {
-                DataQuatities DataQuatities = GetDataQuatities();
-                PepperiDbContext PepperiDbContext = GenerateAndUploadData(DataQuatities);
-            }
+                #region Set ApiClient
 
-            #endregion
+                ApiClient = Factory.CreateApiClientForPrivateApplication(Logger);
 
-            #region Populate Transacion changes from Pepperi UI to ERP
+                #endregion
 
-            bool makeAnotherTransaction = true;
-            while (makeAnotherTransaction == true)
-            {
-                string userInput = null;
-            
-                #region Change data on Pepperi using Pepperi ui, setting its status to Submitted. (eg, submit transaction)
+                #region Ask Should Generate And UploadData
 
-                while (userInput != "ok")
+                bool ShouldGenerateAndUploadData = Ask_ShouldGenerateAndUploadData();
+
+                #endregion
+
+                #region read DataQuatities, Generate And upload Data
+
+                if (ShouldGenerateAndUploadData)
                 {
-                    System.Console.WriteLine("Please Login to Pepperi , view the uploaded data, then make a transaction/s and once you submitted type below ok to see the transaction/s here");
-                    userInput = System.Console.ReadLine();
+                    DataQuatities DataQuatities = GetDataQuatities();
+                    PepperiDbContext PepperiDbContext = GenerateAndUploadData(DataQuatities);
                 }
 
                 #endregion
 
-                #region Read submitted data from Pepperi using Pepperi API (Status = Submitted)
+                #region Populate Transacion changes from Pepperi UI to ERP
 
-                IEnumerable<Transaction> transactions = ReadSubmittedTransactions();
-
-                #endregion
-
-                #region Print submitted transaction lines
-
-                PrintTransactions(transactions);
-
-                #endregion
-
-                #region Update ERP with the submitted Pepperi data
-                #endregion
-
-                #region Update Status of the transactions On Pepperi (to inidcate the changes were saved to ERP)
-
-                UpdateTransactionStatus(transactions, eStatus.Invoice);
-
-                #endregion
-
-                #region ask: make another transaction or exit
-
-                userInput = null;
-                while (userInput != "yes" && userInput != "no")
+                bool makeAnotherTransaction = true;
+                while (makeAnotherTransaction == true)
                 {
-                    System.Console.WriteLine("The program updated the Status field to simulate the integration process - so that only new submitted transactions will be displayed the next time you type 'ok'.\r\n");
-                    System.Console.WriteLine("type 'yes' to make another transaction or 'no' to display how many transactions made in the last 30 days.");
+                    string userInput = null;
 
-                    userInput = System.Console.ReadLine();
-                    if (userInput == "yes")
+                    #region Change data on Pepperi using Pepperi ui, setting its status to Submitted. (eg, submit transaction)
+
+                    while (userInput != "ok")
                     {
-                        makeAnotherTransaction = true;
+                        System.Console.WriteLine("Please Login to Pepperi , view the uploaded data, then make a transaction/s and once you submitted type below ok to see the transaction/s here");
+                        userInput = System.Console.ReadLine();
                     }
-                    if (userInput == "no")
+
+                    #endregion
+
+                    #region Read submitted data from Pepperi using Pepperi API (Status = Submitted)
+
+                    IEnumerable<Transaction> transactions = ReadSubmittedTransactions();
+
+                    #endregion
+
+                    #region Print submitted transaction lines
+
+                    PrintTransactions(transactions);
+
+                    #endregion
+
+                    #region Update ERP with the submitted Pepperi data
+                    #endregion
+
+                    #region Update Status of the transactions On Pepperi (to inidcate the changes were saved to ERP)
+
+                    UpdateTransactionStatus(transactions, eStatus.Invoice);
+
+                    #endregion
+
+                    #region ask: make another transaction or exit
+
+                    userInput = null;
+                    while (userInput != "yes" && userInput != "no")
                     {
-                        makeAnotherTransaction = false;
+                        System.Console.WriteLine("The program updated the Status field to simulate the integration process - so that only new submitted transactions will be displayed the next time you type 'ok'.\r\n");
+                        System.Console.WriteLine("type 'yes' to make another transaction or 'no' to display how many transactions made in the last 30 days.");
+
+                        userInput = System.Console.ReadLine();
+                        if (userInput == "yes")
+                        {
+                            makeAnotherTransaction = true;
+                        }
+                        if (userInput == "no")
+                        {
+                            makeAnotherTransaction = false;
+                        }
                     }
+
+                    #endregion
                 }
 
                 #endregion
+
+
+                #region Print number of transactions in last 30 days
+
+                double numberOfDays = 30;
+                long count = CountTransactions(numberOfDays);
+                System.Console.WriteLine("There were " + count + " Transactions in the last " + numberOfDays + " days");
+
+                #endregion
+
+                #region Goodbye
+
+                System.Console.WriteLine("This was a demo program to help you integrate quickly with Pepperi. Visit us on developer.pepperi.com. ");
+                System.Console.ReadKey();
+
+                #endregion
+
             }
 
-            #endregion
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(ex.ToString());
+                System.Console.ReadKey();
+            }
 
-
-            #region Print number of transactions in last 30 days
-
-            double numberOfDays = 30;
-            long count = CountTransactions(numberOfDays);
-            System.Console.WriteLine("There were " + count + " Transactions in the last " +numberOfDays + " days");
-            
-            #endregion
-
-            #region Goodbye
-
-            System.Console.WriteLine("This was a demo program to help you integrate quickly with Pepperi. Visit us on: developer.pepperi.com.");
-            System.Console.ReadKey();
-
-            #endregion
-
-            
         }
 
         
@@ -270,7 +294,7 @@ namespace Pepperi.Demo.Console
         private static IEnumerable<Transaction> ReadSubmittedTransactions()
         {
             IEnumerable<Transaction> Transactions = ApiClient.Transactions.Find(
-                            where:          "Status=" + (int)eStatus.Submited, 
+                            where:          "Status=" + (int)eStatus.Submitted, 
                             order_by:       "ModificationDateTime DESC", 
                             include_nested: true,   //1:many
                             full_mode: true         //1:1

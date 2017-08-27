@@ -61,37 +61,31 @@ namespace Pepperi.SDK.Helpers
             }
 
 
-            ApiException ApiException = null;
+            PepperiException PepperiException = null;
 
-            if (PepperiHttpClientResponse.HttpStatusCode == System.Net.HttpStatusCode.BadRequest)
+            try
             {
-                try
-                {
-                    ApiException = PepperiJsonSerializer.DeserializeOne<ApiException>(PepperiHttpClientResponse.Body);
-                }
-                catch (Exception e)
-                {
-                    ApiException = new ApiException("Api returned Bad Request. Failed to Parse body as exception.\r\nBody:" +
-                                                    PepperiHttpClientResponse.Body == null ? "" : PepperiHttpClientResponse.Body +
-                                                    "\r\nParsing error: " +
-                                                    e.Message);
-                }
+                ApiException ApiException = PepperiJsonSerializer.DeserializeOne<ApiException>(PepperiHttpClientResponse.Body);
+
+                PepperiException = new PepperiException(
+                    string.Format("{0} (error code ={1})", 
+                            (   ApiException != null && ApiException.fault != null &&  ApiException.fault.faultstring != null) ? ApiException.fault.faultstring : PepperiHttpClientResponse.Body,    //0
+                                ApiException != null && ApiException.fault != null && ApiException.fault.detail != null && ApiException.fault.detail.errorcode!= null ?  ApiException.fault.detail.errorcode : string.Empty 
+                    ),
+                    ApiException,
+                    PepperiHttpClientResponse.HttpStatusCode
+                    );
 
             }
-            else
+            catch (Exception e)
             {
-                ApiException =  new ApiException(
-                    string.Format("Status Code: {0} \r\n Body: {1}",
-                        PepperiHttpClientResponse.HttpStatusCode.ToString(),
-                        PepperiHttpClientResponse.Body == null ? "" : PepperiHttpClientResponse.Body)
-                        );
+                PepperiException = new PepperiException("Api returned Bad Request. Failed to Parse body as exception.\r\nBody:" +
+                                                PepperiHttpClientResponse.Body == null ? "" : PepperiHttpClientResponse.Body +
+                                                "\r\nParsing error: " +
+                                                e.Message);
             }
 
-            //this.Logger.Log("Error:\r\n");
-            //this.Logger.Log("------\r\n");
-            //this.Logger.Log(ApiException.ToString() + "\r\n");
-
-            throw ApiException;
+            throw PepperiException;
         }
 
 

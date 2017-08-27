@@ -29,7 +29,7 @@ namespace Pepperi.SDK.Model.Fixed
     public enum eStatus
     {
         InCreation = 1,             //editable 
-        Submited = 2,               //read only.    Changes were successfully saved to Pepperi. It is ready for upload to ERP (via FTP or API).
+        Submitted = 2,               //read only.    Changes were successfully saved to Pepperi. It is ready for upload to ERP (via FTP or API).
         OnHold = 4,                 //read only.
         Cancelled = 5,              //read only.
         NeedRevision = 6,           //editable
