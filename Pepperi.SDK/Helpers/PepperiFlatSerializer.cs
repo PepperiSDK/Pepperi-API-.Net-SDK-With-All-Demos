@@ -102,6 +102,18 @@ namespace Pepperi.SDK.Helpers
                         continue;
                     }
 
+                    //handle list
+                    if (flatModelProperty.PropertyType == typeof(List<string>))
+                    {
+                        List<string> fieldListValues = fieldValueAsObject as List<string>;
+                        string fieldListAsArray = "";
+                        if (fieldListValues != null && fieldListValues.Count > 0)
+                        {
+                            fieldListAsArray = string.Join("~", fieldListValues);
+                        }                         
+                        FlatLine.Add(fieldListAsArray);
+                        continue;
+                    }
                     //default
                     string fieldValue = fieldValueAsObject.ToString();
                     FlatLine.Add(fieldValue);
@@ -167,7 +179,7 @@ namespace Pepperi.SDK.Helpers
         /// <remarks>
         /// 1. using utf8 (https://msdn.microsoft.com/en-us/library/system.text.encoding.utf8(v=vs.110).aspx)
         /// </remarks>
-        internal static byte[] UTF8StringToZip(string theString, string FilePathToStoreZipFile)
+        internal static byte[] UTF8StringToZip(string theString, string FilePathToStoreZipFile,bool isToAddBOM = true )
         {
             byte[] result = null;
 
@@ -182,8 +194,8 @@ namespace Pepperi.SDK.Helpers
                     //Get the stream of the attachment
                     using (var entryStream = zipArchiveEntry.Open())
                     {
-                        // creates a stream with BOM at the beggining
-                        using (var streamWriter = new StreamWriter(entryStream, new UTF8Encoding(true)))
+                        // creates a stream with BOM at the beggining if required(default=true)
+                        using (var streamWriter = new StreamWriter(entryStream, new UTF8Encoding(isToAddBOM)))
                         {
                             streamWriter.Write(theString);
                         }
