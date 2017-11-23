@@ -46,7 +46,7 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <summary>
         /// </summary>
         /// <param name="Model"></param>
-        /// <param name="include_nested">indicates whether nested data should be upserted.</param>
+        /// <param name="include_nested">indicates whether references (1:many) data should be upserted. reference (1:1) fields are upserted.</param>
         /// <returns></returns>
         /// <remarks>
         /// Post and Get use the same model
@@ -71,7 +71,7 @@ namespace Pepperi.SDK.Endpoints.Base
         ///     
         ///     used in 1:many relations when the child entity can not exist without the parent entity  
         ///             (Contact can not exist without the account)
-        ///             in that case, as you create the child entity (eg, Contact) you use its reference Property  (ExternalID or InternalID) to associate the child with existing parent.   [Do not use the ParentExternalId property of the child, since it is used only in Bulk).
+        ///             in that case, as you create the child entity (eg, Contact) you use its reference Property  (ExternalID or InternalID) to associte the child with existing parent.   [Do not use the ParentExternalId property of the child, since it is used obly in Bulk).
         /// 
         /// </remarks>
         public TModel Upsert(TModel Model, bool? include_nested = null)
@@ -107,8 +107,8 @@ namespace Pepperi.SDK.Endpoints.Base
        /// <param name="data"></param>
         /// <param name="OverrideMethod"></param>
        /// <param name="BulkUploadMethod"></param>
-       /// <param name="fieldsToUpload"></param>s
-       /// <param name="FilePathToStoreZipFile">Optional. Stores the generated zip file for debugging purpose.</param>
+       /// <param name="fieldsToUpload"></param>
+       /// <param name="FilePathToStoreZipFile">Optional. We can store the generated zip file for debugging purpose.</param>
        /// <returns></returns>
         public BulkUploadResponse BulkUpload(IEnumerable<TModel> data,eOverwriteMethod OverrideMethod,  eBulkUploadMethod BulkUploadMethod, IEnumerable<string> fieldsToUpload, bool SaveZipFileInLocalDirectory = false, string SubTypeID="")
         {
@@ -155,9 +155,15 @@ namespace Pepperi.SDK.Endpoints.Base
         public BulkUploadResponse BulkUpload(string csvFilePath, eOverwriteMethod OverwriteMethod, Encoding fileEncoding, string SubTypeID = "", string FilePathToStoreZipFile = null)
         {
             byte[] fileAsBinary =               File.ReadAllBytes(csvFilePath);
+            bool isToAddBOM = true;
+            // UTF8 byte order mark is: 0xEF,0xBB,0xBF
+            if (fileAsBinary[0] == 0xEF && fileAsBinary[1] == 0xBB && fileAsBinary[2] == 0xBF)
+            {
+                isToAddBOM = false;
+            }
             byte[] fileAsUtf8 =                 Encoding.Convert(fileEncoding, Encoding.UTF8, fileAsBinary);
             string fileAsUtf8String =           System.Text.Encoding.UTF8.GetString(fileAsUtf8);
-            byte[] fileAsZipInUTF8 =            PepperiFlatSerializer.UTF8StringToZip(fileAsUtf8String, FilePathToStoreZipFile);
+            byte[] fileAsZipInUTF8 =            PepperiFlatSerializer.UTF8StringToZip(fileAsUtf8String, FilePathToStoreZipFile, isToAddBOM);
 
             BulkUploadResponse result = BulkUploadOfZip(fileAsZipInUTF8, OverwriteMethod, SubTypeID);
             return result;
@@ -191,7 +197,7 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <param name="poolingInternvalInMs"></param>
         /// <param name="numberOfPoolingAttempts"></param>
         /// <returns>the JobInfoResponse  or throws timeout exception</returns>
-        public GetBulkJobInfoResponse WaitForBulkJobToComplete(string JobID, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60*2)
+        public GetBulkJobInfoResponse WaitForBulkJobToComplete(string JobID, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60*5)
         {
             bool bulkUpsertCompleted    = false;
             int getJobInfoAttempts      = 0;
@@ -262,7 +268,7 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <param name="include_nested">populate the References propeties of the result</param>
         /// <param name="full_mode">populate the Reference propeties of the result</param>
         /// <returns></returns>
-        public TModel FindByExternalID(string externalId, bool? include_nested = null, bool? full_mode = null)
+        public TModel FindByExternalID(string externalId, bool? include_nested = null, bool? full_mode = null)//not relevant for: inventory and user defined tables
         {
             string RequestUri = ResourceName + "//externalid//" + HttpUtility.UrlEncode(externalId);
             Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
@@ -291,11 +297,11 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <param name="page"></param>
         /// <param name="page_size"></param>
         /// <param name="include_nested"></param>
-        /// <param name="include_nested">populate the References propeties of the result</param>
-        /// <param name="full_mode">populate the Reference propeties of the result</param>
+        /// <param name="include_nested">populate the References propeties of the result(1:many)</param>
+        /// <param name="full_mode">populate the Reference propeties of the result (1:1)</param>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public IEnumerable<TModel> Find(string where = null, string order_by = null, int? page = null, int? page_size = null, bool? include_nested = null, bool? full_mode = null, bool? include_deleted = null, string fields = null)
+        public IEnumerable<TModel> Find(string where = null, string order_by = null, int? page = null, int? page_size = null, bool? include_nested = null, bool? full_mode = null, bool? include_deleted = null, string fields = null, bool? is_distinct = null)
         {
             string RequestUri = ResourceName;
 
@@ -308,6 +314,7 @@ namespace Pepperi.SDK.Endpoints.Base
             if (full_mode.HasValue) { dicQueryStringParameters.Add("full_mode", full_mode.Value.ToString()); }
             if (include_deleted.HasValue) { dicQueryStringParameters.Add("include_deleted", include_deleted.Value.ToString()); }
             if (fields != null) { dicQueryStringParameters.Add("fields", fields); }
+            if (is_distinct != null) { dicQueryStringParameters.Add("is_distinct", fields); }
 
             string accept = "application/json";
 
@@ -450,15 +457,15 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <returns>the sub types of this resource</returns>
         /// <remarks>
         /// 1. some resources (eg, transaction and activity) are "abstract types".
-        ///    the concrete types "derives" from them:               eg, sales transaction, invoice  derive from transaction     (with header and lines) 
+        ///    the concrete types "derive" from them:               eg, sales transaction, invoice  derive from transaction     (with header and lines) 
         ///                                                         eg, visit                       derive from activity        (with header)
-        ///    the concrete class custom fields are modeled as TSA fields
+        ///    the concrete class cusom fields are modeled as TSA filed
         /// 2. All the types are returned by metadata endpoint 
-        /// 3. Activities, Transactions are "abstract" type
+        /// 3. Activities, Transactions, transaction_lines are "abstract" type. Acconut is concrete typr that may be derived by SubType.
         ///     The concrete type is identified by ActivityTypeID
         ///     For Bulk or CSV upload, the ActivityTypeID is sent on the url   
         ///     For single Upsert,      the ActivityTypeID is set on the object
-        ///     The values of the ActivityTypeID are taken from the GetSubTypesMetadata method
+        ///     The values of the ActivityTypeID are taken from the SubTypeMetadata action
         /// </remarks>
         public IEnumerable<TypeMetadata> GetSubTypesMetadata()
         {
@@ -492,9 +499,14 @@ namespace Pepperi.SDK.Endpoints.Base
         /// </summary>
         /// <param name="UserDefinedField"></param>
         /// <returns>The name of the newly created field</returns>
-        public string CreateUserDefinedField(UserDefinedField UserDefinedField)
+        public string CreateUserDefinedField(UserDefinedField UserDefinedField, string SubTypeID=null)
         {
-            string RequestUri = string.Format(@"customization/user_defined_fields/{0}", this.ResourceName);
+
+            string RequestUri =
+               (SubTypeID == null || SubTypeID.Length == 0) ?
+                   string.Format(@"metadata/{0}", this.ResourceName) :
+                   string.Format(@"metadata/{0}/{1}", ResourceName, SubTypeID);
+
             Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
             string postBody = PepperiJsonSerializer.Serialize(UserDefinedField);                                       //null values are not serialized
             string contentType = "application/json";
@@ -552,7 +564,7 @@ namespace Pepperi.SDK.Endpoints.Base
             return result;
         }
 
-        private BulkUploadResponse BulkUploadOfZip(IEnumerable<TModel> data, eOverwriteMethod OverwriteMethod, IEnumerable<string> fieldsToUpload, string FilePathToStoreZipFile, string SubTypeID)
+        private BulkUploadResponse BulkUploadOfZip(IEnumerable<TModel> data, eOverwriteMethod OverwriteMethod, IEnumerable<string> fieldsToUpload, string FilePathToStoreZipFile, string SubTypeID=null)
         {
             FlatModel FlatModel = PepperiFlatSerializer.MapDataToFlatModel(data, fieldsToUpload, "''");
 
@@ -582,7 +594,7 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <remarks>
         /// 1. the post body is in UTF8
         /// </remarks>
-        private BulkUploadResponse BulkUploadOfZip(byte[] fileAsZipInUTF8, eOverwriteMethod OverwriteMethod, string SubTypeID)
+        private BulkUploadResponse BulkUploadOfZip(byte[] fileAsZipInUTF8, eOverwriteMethod OverwriteMethod, string SubTypeID=null)
         {
             string RequestUri =
                 (SubTypeID == null || SubTypeID.Length == 0) ?
