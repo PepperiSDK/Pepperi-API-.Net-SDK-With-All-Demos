@@ -14,6 +14,9 @@ namespace Pepperi.Test.MVC
     {
         protected void Application_Start()
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
+                        | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
+                        
             AreaRegistration.RegisterAllAreas();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);

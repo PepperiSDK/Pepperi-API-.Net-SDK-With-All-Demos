@@ -13,6 +13,9 @@ namespace Pepperi.ModelGenerator
     {
         static void Main(string[] args)
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
+                        | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
+            
             #region create apiClient instance
 
             ILogger Logger = Factory.GetLogger();

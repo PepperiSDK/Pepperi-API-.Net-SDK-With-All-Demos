@@ -14,6 +14,8 @@ namespace WindowsFormsApp1
         [STAThread]
         static void Main()
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
+                        | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new frmSample());

@@ -42,6 +42,8 @@ namespace Pepperi.Demo.Console
 
         static Program()
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
+                        | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
             Logger = Factory.GetLogger();
             ApiClient = null;
         }
