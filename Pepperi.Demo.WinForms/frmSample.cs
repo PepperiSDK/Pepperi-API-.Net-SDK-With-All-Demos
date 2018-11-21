@@ -61,7 +61,6 @@ namespace WindowsFormsApp1
             var item = items[index];
             var updatedItme = client.Items.Upsert(item);
             MessageBox.Show("done!");
-
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -85,6 +84,9 @@ namespace WindowsFormsApp1
 
         private void frmSample_Load(object sender, EventArgs e)
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
+            | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
+
             if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "token.txt"))
             {
                 txtToken.Text = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt");
