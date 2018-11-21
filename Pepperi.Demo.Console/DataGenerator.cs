@@ -1023,42 +1023,42 @@ namespace Pepperi.Demo.Console
         #endregion
 
 
-        #region Item Images
+        //#region Item Images
 
-        private void UploadImagesForItems(int numberOfItems)
-        {
-            for (int i = 0; i < numberOfItems; i++)
-            {
-                if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("uploading image for item external id: " + PepperiDbContext.Items[i].ExternalID); }
-                UploadImageForItem(PepperiDbContext.Items[i]);
-            }
-        }
+        //private void UploadImagesForItems(int numberOfItems)
+        //{
+        //    for (int i = 0; i < numberOfItems; i++)
+        //    {
+        //        if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("uploading image for item external id: " + PepperiDbContext.Items[i].ExternalID); }
+        //        UploadImageForItem(PepperiDbContext.Items[i]);
+        //    }
+        //}
 
-        private void UploadImageForItem(Item ItemFromContext)
-        {
-            string Image1_UploadUrl = "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg";
-            byte[] Image1_AsByteArray = null;
-            using (var wc = new System.Net.WebClient())
-            {
-                Image1_AsByteArray = wc.DownloadData(Image1_UploadUrl);
-            }
+        //private void UploadImageForItem(Item ItemFromContext)
+        //{
+        //    string Image1_UploadUrl = "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg";
+        //    byte[] Image1_AsByteArray = null;
+        //    using (var wc = new System.Net.WebClient())
+        //    {
+        //        Image1_AsByteArray = wc.DownloadData(Image1_UploadUrl);
+        //    }
 
-            string Image1_AsBase64String = Convert.ToBase64String(Image1_AsByteArray);
+        //    string Image1_AsBase64String = Convert.ToBase64String(Image1_AsByteArray);
 
 
-            Item Item = new Item();
-            Item.ExternalID = ItemFromContext.ExternalID;
+        //    Item Item = new Item();
+        //    Item.ExternalID = ItemFromContext.ExternalID;
 
-            Item.Image = new Image();
-            Item.Image.URL = Image1_UploadUrl;
+        //    Item.Image = new Image();
+        //    Item.Image.URL = Image1_UploadUrl;
 
-            Item.Image2 = new Image();
-            Item.Image2.URL = Image1_UploadUrl;
+        //    Item.Image2 = new Image();
+        //    Item.Image2.URL = Image1_UploadUrl;
 
-            Item UpsertResponse2 = ApiClient.Items.Upsert(Item);
-        }
+        //    Item UpsertResponse2 = ApiClient.Items.Upsert(Item);
+        //}
 
-        #endregion
+        //#endregion
 
 
         #region private helpers
