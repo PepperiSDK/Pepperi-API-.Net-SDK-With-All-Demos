@@ -1,4 +1,4 @@
-﻿using Pepperi.SDK.Exceptions;
+using Pepperi.SDK.Exceptions;
 using Pepperi.SDK.Model.Fixed;
 using System;
 using System.Collections.Generic;
@@ -101,6 +101,15 @@ namespace Pepperi.SDK.Helpers
                         FlatLine.Add(fieldValueAsString);
                         continue;
                     }
+
+                    //handle Numbers - uncomment if you want to change format
+                    //if (flatModelProperty.PropertyType == typeof(Nullable<Double>))
+                    //{
+                    //    Double? fieldValueAsDouble = fieldValueAsObject as Double?;
+                    //    string fieldValueAsString = (fieldValueAsDouble == null) ? lineValueForNullValue : fieldValueAsDouble.Value.ToString("0,00");
+                    //    FlatLine.Add(fieldValueAsString);
+                    //    continue;
+                    //}
 
                     //handle list
                     if (flatModelProperty.PropertyType == typeof(List<string>))
@@ -269,7 +278,27 @@ namespace Pepperi.SDK.Helpers
 
             return fieldValue;
         }
-    
+
+        //private static bool IsNumericType(Type propType)
+        //{
+        //    switch (Type.GetTypeCode(propType))
+        //    {
+        //        case TypeCode.Byte:
+        //        case TypeCode.SByte:
+        //        case TypeCode.UInt16:
+        //        case TypeCode.UInt32:
+        //        case TypeCode.UInt64:
+        //        case TypeCode.Int16:
+        //        case TypeCode.Int32:
+        //        case TypeCode.Int64:
+        //        case TypeCode.Decimal:
+        //        case TypeCode.Double:
+        //        case TypeCode.Single:
+        //            return true;
+        //        default:
+        //            return false;
+        //    }
+        //}
         #endregion
     }
 
