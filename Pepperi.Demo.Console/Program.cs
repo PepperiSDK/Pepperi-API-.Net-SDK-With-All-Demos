@@ -1,4 +1,5 @@
-﻿using Pepperi.SDK;
+﻿using Pepperi.Demo.Console.Demos;
+using Pepperi.SDK;
 using Pepperi.SDK.Contracts;
 using Pepperi.SDK.Exceptions;
 using Pepperi.SDK.Model;
@@ -20,15 +21,15 @@ namespace Pepperi.Demo.Console
     //-see agent name works
     //4. end: read and print transaciton in last 30 datys
 
-   
-    
+
+
     //5. model generator: same beginig
     //6. enter yes to generate model including user defined fields or no to generate without it
 
-    
+
 
     //images
-    
+
     class Program
     {
         #region Properties
@@ -42,8 +43,6 @@ namespace Pepperi.Demo.Console
 
         static Program()
         {
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
-                        | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
             Logger = Factory.GetLogger();
             ApiClient = null;
         }
@@ -52,10 +51,6 @@ namespace Pepperi.Demo.Console
 
         static void Main(string[] args)
         {
-
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
-            | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
-
             try
             {
                 #region Set ApiClient
@@ -80,9 +75,10 @@ namespace Pepperi.Demo.Console
 
                 #endregion
 
-                #region Populate Transacion changes from Pepperi UI to ERP
+                #region Populate Transaction changes from Pepperi UI to ERP
 
-                bool makeAnotherTransaction = true;
+                var shouldShowPopulateTransactionDemo = ConsoleInteractions.AskWithBoolResponse("Should show Transaction Changes Demo? (Type 'yes' / 'no')");
+                bool makeAnotherTransaction = shouldShowPopulateTransactionDemo;
                 while (makeAnotherTransaction == true)
                 {
                     string userInput = null;
@@ -151,6 +147,13 @@ namespace Pepperi.Demo.Console
 
                 #endregion
 
+
+                #region Other Demos
+
+                UserDefinedCollectionsDemo.StartDemo(ApiClient);
+
+                #endregion
+
                 #region Goodbye
 
                 System.Console.WriteLine("This was a demo program to help you integrate quickly with Pepperi. Visit us on developer.pepperi.com. ");
@@ -168,7 +171,7 @@ namespace Pepperi.Demo.Console
 
         }
 
-        
+
 
         private static bool Ask_ShouldGenerateAndUploadData()
         {
@@ -225,7 +228,7 @@ namespace Pepperi.Demo.Console
 
             while (size == null)
             {
-                System.Console.WriteLine ("enter high/mid/low");
+                System.Console.WriteLine("enter high/mid/low");
                 string resultAsString = System.Console.ReadLine();
 
                 if (resultAsString == "low" || resultAsString == "mid" || resultAsString == "high")
@@ -240,13 +243,13 @@ namespace Pepperi.Demo.Console
             {
                 case "low":
                     {
-                        DataQuatities.generate_X_Item                             = 1000;
-                        DataQuatities.generate_X_PriceList                        = 10;
-                        DataQuatities.generate_X_accounts                         = 100;
-                        DataQuatities.generate_X_contactsPerAccount               = 5;
-                        DataQuatities.generate_X_transactionsPerAccount           = 10;
-                        DataQuatities.generate_X_transactionLinesPerTransaction   = 5;
-                        DataQuatities.generate_X_activitierPerAccount             = 4;
+                        DataQuatities.generate_X_Item = 1000;
+                        DataQuatities.generate_X_PriceList = 10;
+                        DataQuatities.generate_X_accounts = 100;
+                        DataQuatities.generate_X_contactsPerAccount = 5;
+                        DataQuatities.generate_X_transactionsPerAccount = 10;
+                        DataQuatities.generate_X_transactionLinesPerTransaction = 5;
+                        DataQuatities.generate_X_activitierPerAccount = 4;
                         break;
                     }
                 case "mid":
@@ -272,11 +275,11 @@ namespace Pepperi.Demo.Console
                         break;
                     }
                 default:
-                    throw new PepperiException("unexpected size: " + size== null ? " " : size);
+                    throw new PepperiException("unexpected size: " + size == null ? " " : size);
 
             }
 
-            return  DataQuatities;
+            return DataQuatities;
         }
 
         private static PepperiDbContext GenerateAndUploadData(DataQuatities DataQuatities)
@@ -300,8 +303,8 @@ namespace Pepperi.Demo.Console
         private static IEnumerable<Transaction> ReadSubmittedTransactions()
         {
             IEnumerable<Transaction> Transactions = ApiClient.Transactions.Find(
-                            where:          "Status=" + (int)eStatus.Submitted, 
-                            order_by:       "ModificationDateTime DESC", 
+                            where: "Status=" + (int)eStatus.Submitted,
+                            order_by: "ModificationDateTime DESC",
                             include_nested: true,   //1:many
                             full_mode: true         //1:1
                             );
@@ -317,19 +320,19 @@ namespace Pepperi.Demo.Console
                 System.Console.WriteLine("Header:");
                 System.Console.WriteLine("*******");
                 System.Console.WriteLine("DateCreated || Account Name|| PepperiID || ExternalID || Agent Name || LastModified || GrandTotal || Status ");
-                System.Console.WriteLine(   string.Format ( "{0} || {1} || {2} || {3} || {4} || {5} || {6} || {7}",
-                                                Transaction.CreationDateTime.HasValue ? Transaction.CreationDateTime.Value.ToUniversalTime().ToString("u") : "",            
+                System.Console.WriteLine(string.Format("{0} || {1} || {2} || {3} || {4} || {5} || {6} || {7}",
+                                                Transaction.CreationDateTime.HasValue ? Transaction.CreationDateTime.Value.ToUniversalTime().ToString("u") : "",
                                                 Transaction.Account.Data.Name != null ? Transaction.Account.Data.Name : "",
-                                                Transaction.InternalID.HasValue ?       Transaction.InternalID.Value.ToString() : "",                                                  
-                                                Transaction.ExternalID !=null ?         Transaction.ExternalID : "",                                                        
+                                                Transaction.InternalID.HasValue ? Transaction.InternalID.Value.ToString() : "",
+                                                Transaction.ExternalID != null ? Transaction.ExternalID : "",
                                                 (Transaction.Agent != null && Transaction.Agent.Data != null && Transaction.Agent.Data.FirstName != null ? Transaction.Agent.Data.FirstName : "") + " " +
-                                                (Transaction.Agent != null && Transaction.Agent.Data != null && Transaction.Agent.Data.LastName  != null ? Transaction.Agent.Data.LastName : "") + " ",        
-                                                Transaction.ModificationDateTime.HasValue ? Transaction.ModificationDateTime.Value.ToUniversalTime().ToString("u") : "" ,   
-                                                Transaction.GrandTotal != null ? Transaction.GrandTotal.ToString(): "",                                 
-                                                Transaction.Status.HasValue ? Transaction.Status.ToString() : ""                                        
+                                                (Transaction.Agent != null && Transaction.Agent.Data != null && Transaction.Agent.Data.LastName != null ? Transaction.Agent.Data.LastName : "") + " ",
+                                                Transaction.ModificationDateTime.HasValue ? Transaction.ModificationDateTime.Value.ToUniversalTime().ToString("u") : "",
+                                                Transaction.GrandTotal != null ? Transaction.GrandTotal.ToString() : "",
+                                                Transaction.Status.HasValue ? Transaction.Status.ToString() : ""
                                                 ));
 
-                
+
                 System.Console.WriteLine("Lines");
                 System.Console.WriteLine("*****");
                 System.Console.WriteLine("ItemExternalID ||  UnitsQuantity || Unit Price After Discount || Total Units Price After Discount");
@@ -338,11 +341,11 @@ namespace Pepperi.Demo.Console
                 {
                     foreach (var TransactionLine in Transaction.TransactionLines.Data)
                     {
-                        System.Console.WriteLine(   string.Format ( "{0} || {1} || {2} || {3}",
-                            
-                            TransactionLine.ItemExternalID != null ? TransactionLine.ItemExternalID : "" ,
-                            TransactionLine.UnitsQuantity.HasValue ? TransactionLine.UnitsQuantity.Value.ToString() : "",
-                            TransactionLine.UnitPriceAfterDiscount.HasValue ?  TransactionLine.UnitPriceAfterDiscount.Value.ToString() : "",
+                        System.Console.WriteLine(string.Format("{0} || {1} || {2} || {3}",
+
+                            TransactionLine.ItemExternalID != null ? TransactionLine.ItemExternalID : "",
+                            TransactionLine.UnitsQuantity,
+                            TransactionLine.UnitPriceAfterDiscount,
                             TransactionLine.TotalUnitsPriceAfterDiscount.HasValue ? TransactionLine.TotalUnitsPriceAfterDiscount.Value.ToString() : ""
                             ));
                     }
@@ -351,20 +354,20 @@ namespace Pepperi.Demo.Console
 
         }
 
-        private static void UpdateTransactionStatus (IEnumerable<Transaction> Transactions, eStatus newStatus)
-        {   
+        private static void UpdateTransactionStatus(IEnumerable<Transaction> Transactions, eStatus newStatus)
+        {
             foreach (var transactionFromDB in Transactions)
             {
-                Transaction TransactionToUpsert     = new Transaction();
-                TransactionToUpsert.InternalID      = transactionFromDB.InternalID;
-                TransactionToUpsert.Status          = (int)newStatus; 
+                Transaction TransactionToUpsert = new Transaction();
+                TransactionToUpsert.InternalID = transactionFromDB.InternalID;
+                TransactionToUpsert.Status = (int)newStatus;
 
-                Transaction UpdatedTransaction      = ApiClient.Transactions.Upsert (TransactionToUpsert);
+                Transaction UpdatedTransaction = ApiClient.Transactions.Upsert(TransactionToUpsert);
             }
         }
 
 
-        private static long CountTransactions(double numberOfDays )
+        private static long CountTransactions(double numberOfDays)
         {
             long result = ApiClient.Transactions.GetCount(
                             where: "ActionDateTime >" + "'" + DateTime.UtcNow.AddDays((-1) * numberOfDays).ToString("yyyy-MM-ddTHH:mm:ssZ") + "'");

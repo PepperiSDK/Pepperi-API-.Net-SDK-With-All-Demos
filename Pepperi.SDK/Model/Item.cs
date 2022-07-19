@@ -10,8 +10,11 @@ namespace Pepperi.SDK.Model
 	public class Item
 	{
 		 public Boolean? AllowDecimal 	{get; set; }
+		 public Int64? BrandInternalID 	{get; set; }
+		 public Int64? CampaignID 	{get; set; }
 		 public Double? CaseQuantity 	{get; set; }
 		 public Decimal? CostPrice 	{get; set; }
+		 public DateTime? CreationDateTime 	{get; set; }
 		 public String Dimension1Code 	{get; set; }
 		 public String Dimension1Name 	{get; set; }
 		 public String Dimension2Code 	{get; set; }
@@ -29,8 +32,9 @@ namespace Pepperi.SDK.Model
 		 public Image Image6 	{get; set; }
 		 public Int64? InternalID 	{get; set; }
 		 public String LongDescription 	{get; set; }
-		 public String MainCategoryID 	{get; set; }
+		 public String MainCategory 	{get; set; }
 		 public Double? MinimumQuantity 	{get; set; }
+		 public DateTime? ModificationDateTime 	{get; set; }
 		 public String Name 	{get; set; }
 		 public String ParentExternalID 	{get; set; }
 		 public Decimal? Price 	{get; set; }
@@ -45,6 +49,8 @@ namespace Pepperi.SDK.Model
 		 public String Prop9 	{get; set; }
 		 public Decimal? SecondaryPrice 	{get; set; }
 		 public String UPC 	{get; set; }
+		 public Guid? UUID 	{get; set; }
 		 public References<Inventory> Inventory { get; set; }
+		 public Reference<Item> Parent { get; set; }
 	}
 }

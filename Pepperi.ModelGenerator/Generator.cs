@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Pepperi.ModelGenerator.Model.Common;
 using Pepperi.SDK.Model.Fixed;
+using Pepperi.SDK.Model.Fixed.MetaData;
+using Pepperi.SDK.Contracts;
 
 namespace Pepperi.ModelGenerator
 {
@@ -35,22 +37,22 @@ namespace Pepperi.ModelGenerator
         public ModelGenerator(ApiClient ApiClient)
         {
             this.ApiClient = ApiClient;
-            this.ModelClassNameToHardCodedFields = new Dictionary<eModelClassName,List<string>>();
+            this.ModelClassNameToHardCodedFields = new Dictionary<eModelClassName, List<string>>();
 
 
             foreach (eModelClassName ModelClassName in Enum.GetValues(typeof(eModelClassName)))
             {
-                ModelClassNameToHardCodedFields.Add(ModelClassName, new List<string>());     
+                ModelClassNameToHardCodedFields.Add(ModelClassName, new List<string>());
             }
 
-          
+
             #region Add hard coded feilds
 
             ModelClassNameToHardCodedFields[eModelClassName.Account] =
                                 new List<string>()
                                 {
                                     "public Reference<Account> Parent { get; set; }",
-                                    "public Reference<PriceList> PriceList { get; set; }",    
+                                    "public Reference<PriceList> PriceList { get; set; }",
                                     "public Reference<SpecialPriceList> SpecialPriceList { get; set; }",
                                     "public References<AccountCatalog> Catalogs { get; set; }",
                                     "public References<User> Users { get; set; }",
@@ -60,7 +62,7 @@ namespace Pepperi.ModelGenerator
             ModelClassNameToHardCodedFields[eModelClassName.AccountCatalog] =
                                 new List<string>()
                                 {
-                                    "public Reference<Account> Account { get; set; }",                
+                                    "public Reference<Account> Account { get; set; }",
                                     "public Reference<Catalog> Catalog { get; set; }",
                                 };
 
@@ -68,8 +70,8 @@ namespace Pepperi.ModelGenerator
             ModelClassNameToHardCodedFields[eModelClassName.AccountUser] =
                                new List<string>()
                                 {
-                                    "public Reference<Account> Account { get; set; }",                
-                                    "public Reference<User> User { get; set; }",   
+                                    "public Reference<Account> Account { get; set; }",
+                                    "public Reference<User> User { get; set; }",
                                 };
 
 
@@ -77,8 +79,8 @@ namespace Pepperi.ModelGenerator
             ModelClassNameToHardCodedFields[eModelClassName.AccountInventory] =
                                new List<string>()
                                 {
-                                    "public Reference<Account> Account { get; set; }",                
-                                    "public Reference<Item> Item { get; set; }",   
+                                    "public Reference<Account> Account { get; set; }",
+                                    "public Reference<Item> Item { get; set; }",
                                 };
 
             ModelClassNameToHardCodedFields[eModelClassName.Activity] =
@@ -95,6 +97,7 @@ namespace Pepperi.ModelGenerator
                               new List<string>()
                                 {
                                     "public References<Inventory> Inventory { get; set; }",
+                                    "public Reference<Item> Parent { get; set; }",
                                 };
 
             ModelClassNameToHardCodedFields[eModelClassName.Inventory] =
@@ -107,7 +110,7 @@ namespace Pepperi.ModelGenerator
             ModelClassNameToHardCodedFields[eModelClassName.Contact] =
                               new List<string>()
                                 {
-                                    "public Reference<Account> Account { get; set; }"               
+                                    "public Reference<Account> Account { get; set; }"
                                 };
 
 
@@ -121,7 +124,7 @@ namespace Pepperi.ModelGenerator
             ModelClassNameToHardCodedFields[eModelClassName.Transaction] =
                              new List<string>()
                                 {
-                                    "public Reference<Account> OriginAccount    { get; set; }",      
+                                    "public Reference<Account> OriginAccount    { get; set; }",
                                     "public Reference<Account> Account  { get; set; }",
                                     "public Reference<Catalog> Catalog  { get; set; }",
                                     "public Reference<Contact> ContactPerson { get; set; }",
@@ -130,15 +133,15 @@ namespace Pepperi.ModelGenerator
 
                                      "public References<TransactionLine> TransactionLines   { get; set; }",
                                 };
-           
 
-            ModelClassNameToHardCodedFields[eModelClassName.TransactionLine] = 
+
+            ModelClassNameToHardCodedFields[eModelClassName.TransactionLine] =
                                 new List<string>()
                                 {
                                     "public Reference<Transaction> Transaction { get; set; }",
                                     "public Reference<Item> Item { get; set; }",
                                 };
-     
+
 
 
 
@@ -155,7 +158,7 @@ namespace Pepperi.ModelGenerator
         /// <param name="modelNamespace"></param>
         /// <param name="outputDirectory"></param>
         /// <param name="generateCustomFields">eg, TSA fields</param>
-        public void GenerateModelsCode(string modelNamespace, string outputDirectory, bool generateCustomFields)
+        public void GenerateModelsCode(string modelNamespace, string outputDirectory, bool generateCustomFields, bool generateUDC = false)
         {
             #region validate input
 
@@ -174,23 +177,35 @@ namespace Pepperi.ModelGenerator
 
             #region Generate Code
 
-            Dictionary<string,string> fileName_To_ClassCode = new Dictionary<string,string>();
+            Dictionary<string, string> fileName_To_ClassCode = new Dictionary<string, string>();
+
 
             foreach (eModelClassName ClassName in Enum.GetValues(typeof(eModelClassName)))
             {
-                IEnumerable<FieldMetadata> FieldsMetadata = GetFieldsMetadataByClassName(ClassName);
+                IEnumerable<Field_MetaData> Fields_MetaData = GetFieldsMetadataByClassName(ClassName);
                 List<string> HardCodedFields = ModelClassNameToHardCodedFields[ClassName];
                 string ClassNameAsString = ClassName.ToString();
-                string ClassCode = GenerateClassCode(modelNamespace, ClassNameAsString, FieldsMetadata, HardCodedFields, generateCustomFields);
+                string ClassCode = GenerateClassCode(modelNamespace, ClassNameAsString, Fields_MetaData, HardCodedFields, generateCustomFields);
                 string FileName = ClassNameAsString + ".cs";
                 fileName_To_ClassCode.Add(FileName, ClassCode);
-            }                   
+            }
+
+            #region User Defined Collections
+
+            if (generateUDC)
+            {
+                var userDefinedCollectionsCode = GenerateCodeForUserDefinedCollections(modelNamespace);
+                fileName_To_ClassCode.Add("UserDefinedCollections.cs", userDefinedCollectionsCode);
+            }
 
             #endregion
-                
+
+
+            #endregion
+
             #region Save Files
 
-            foreach (string fileName  in fileName_To_ClassCode.Keys)
+            foreach (string fileName in fileName_To_ClassCode.Keys)
             {
                 string classCode = fileName_To_ClassCode[fileName];
                 SaveFile(outputDirectory, classCode, fileName);
@@ -203,112 +218,112 @@ namespace Pepperi.ModelGenerator
 
         #region private metohds
 
-        private IEnumerable<FieldMetadata> GetFieldsMetadataByClassName(eModelClassName ClassName)
+        private IEnumerable<Field_MetaData> GetFieldsMetadataByClassName(eModelClassName ClassName)
         {
-            IEnumerable<FieldMetadata> result = null;
+            IEnumerable<Field_MetaData> result = null;
             switch (ClassName)
             {
                 case eModelClassName.Account:
-                {
-                    result = ApiClient.Accounts.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.AccountsMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.AccountCatalog:
-                {
-                    result = ApiClient.AccountCatalogs.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.AccountCatalogsMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.AccountInventory:
-                {
-                    result = ApiClient.AccountInventory.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.AccountInventoryMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.AccountUser:
-                {
-                    result = ApiClient.AccountUsers.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.AccountUsersMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.Activity:
-                {
-                    result = ApiClient.Activities.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.ActivitiesMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.Catalog:
-                {
-                    result = ApiClient.Catalogs.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.CatalogsMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.Contact:
-                {
-                    result = ApiClient.Contacts.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.ContactsMetaData.GetFields();
+                        break;
+                    }
                 case eModelClassName.Inventory:
-                {
-                    result = ApiClient.Inventory.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.InventoryMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.Item:
-                {
-                    result = ApiClient.Items.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.ItemsMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.ItemDimensions1:
-                {
-                    result = ApiClient.ItemDimensions1.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.ItemDimensions1_MetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.ItemDimensions2:
-                {
-                    result = ApiClient.ItemDimensions2.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.ItemDimensions2_MetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.PriceList:
-                {
-                    result = ApiClient.PriceLists.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.PriceListsMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.ItemPrice:
-                {
-                    result = ApiClient.ItemPrices.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.ItemPricesMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.SpecialPriceList:
-                {
-                    result = ApiClient.SpecialPriceLists.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.SpecialPriceListsMetaData.GetFields();
+                        break;
+                    }
 
-                
+
                 case eModelClassName.Transaction:
-                {
-                    result = ApiClient.Transactions.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.TransactionsMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.TransactionLine:
-                {
-                    result = ApiClient.TransactionLines.GetFieldsMetaData();
-                     break;
-                }
+                    {
+                        result = ApiClient.TransactionLinesMetaData.GetFields();
+                        break;
+                    }
 
                 case eModelClassName.User:
-                {
-                    result = ApiClient.Users.GetFieldsMetaData();
-                    break;
-                }
+                    {
+                        result = ApiClient.UsersMetaData.GetFields();
+                        break;
+                    }
 
                 /*
                 The model class is not generated by the generator (Reason: the metadata is not accurate.)
@@ -333,21 +348,113 @@ namespace Pepperi.ModelGenerator
                 //}
 
                 default:
-                {
-                    throw new PepperiException ("Failed to generate code. Reason: class name " + ClassName.ToString() + " is not supported.");
-                }
+                    {
+                        throw new PepperiException("Failed to generate code. Reason: class name " + ClassName.ToString() + " is not supported.");
+                    }
             }
 
             return result;
 
         }
 
+
+        private string GenerateCodeForUserDefinedCollections(string modelNamespace)
+        {
+            var schemes = ApiClient.UserDefinedCollectionsMetaData.GetUserDefinedCollections();
+
+            StringBuilder sbCode = new StringBuilder();
+            sbCode.AppendLine("using System;");
+            sbCode.AppendLine("using System.Collections.Generic;");
+            sbCode.AppendLine("using System.Linq;");
+            sbCode.AppendLine("using System.Text;");
+            sbCode.AppendLine("using System.Threading.Tasks;");
+            sbCode.AppendLine("using Pepperi.SDK.Model.Fixed;");
+            sbCode.AppendLine("");
+            sbCode.AppendLine("namespace " + modelNamespace);
+            sbCode.AppendLine("{");
+
+            var result = new Dictionary<string, string>();
+            foreach (var scheme in schemes)
+            {
+                sbCode.AppendLine(GenerateCodeForUserDefinedCollection(scheme));
+                sbCode.AppendLine("");
+            }
+
+            sbCode.AppendLine("}");
+            return sbCode.ToString();
+        }
+
+        private string GenerateCodeForUserDefinedCollection(UserDefinedCollection_MetaData scheme)
+        {
+            var schemeName = scheme.Name;
+            var className = $"UserDefinedCollection_{schemeName}";
+            var fields = scheme.Fields;
+
+            StringBuilder sbCode = new StringBuilder();
+
+            sbCode.AppendLine("\tpublic class " + className);
+            sbCode.AppendLine("\t{");
+
+            foreach (var field in fields)
+            {
+                sbCode.AppendLine(GenerateCodeForUserDefinedField(field.Key, field.Value));
+            }
+
+            sbCode.AppendLine("\t}"); //close the class
+
+
+            string classSourceCode = sbCode.ToString();
+            return classSourceCode;
+        }
+
+        private string GenerateCodeForUserDefinedField(string fieldName, UserDefinedCollection_Field field)
+        {
+            var dataType = field.Type;
+            if (dataType == null || dataType.Trim().Length == 0)
+            {
+                return ""; // incorrect field
+            }
+            string nullableValue = dataType.ToLower() != "string" && dataType.ToLower() != "array" ? "?" : string.Empty;
+            var mappedType = MapPepperiFieldTypeToDotNet(dataType, field?.Items?.Type);
+            if (mappedType == null)
+            {
+                return "";
+            }
+            return "\t\t public " + mappedType + nullableValue + " " + fieldName + " \t{get; set; }";  //eg, publc int? Ammount { get; set; };
+        }
+
+        private string MapPepperiFieldTypeToDotNet(string fieldType, string itemsType)
+        {
+            switch (fieldType)
+            {
+                case "String":
+                    return "string";
+                case "Integer":
+                    return "Int64";
+                case "Double":
+                    return "Double";
+                case "Bool":
+                    return "Boolean";
+                case "Array":
+                    if (itemsType != "Array")
+                    {
+                        var mappedItemType = MapPepperiFieldTypeToDotNet(itemsType, null);
+                        return $"IEnumerable<{mappedItemType}>";
+                    }
+                    return null;
+                case "DateTime":
+                    return "DateTime";
+                default:
+                    return null;
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="modelNamespace"></param>
         /// <param name="clasName"></param>
-        /// <param name="fieldsMetadata"></param>
+        /// <param name="Fields_MetaData"></param>
+        /// <param name="HardCodedFields"></param>
         /// <param name="generateCustomFields"></param>
         /// <returns></returns>
         /// <remarks>
@@ -359,7 +466,7 @@ namespace Pepperi.ModelGenerator
         ///             the server will not change properties that are not sent and replace properties that are sent
         ///             for data types that are not string we add ? to make it nullable 
         /// </remarks>
-        private string GenerateClassCode(string modelNamespace, string clasName, IEnumerable<FieldMetadata> FieldsMetadata, List<string> HardCodedFields, bool generateCustomFields)
+        private string GenerateClassCode(string modelNamespace, string clasName, IEnumerable<Field_MetaData> Fields_MetaData, List<string> HardCodedFields, bool generateCustomFields)
         {
             StringBuilder sbCode = new StringBuilder();
             StringBuilder sbReport = new StringBuilder();
@@ -390,12 +497,25 @@ namespace Pepperi.ModelGenerator
 
             #region metadaa fields
 
-            foreach (var FieldMetadata in FieldsMetadata)
+            foreach (var Field_MetaData in Fields_MetaData)
             {
-                string DataType = FieldMetadata.DataType;
-                string Name = FieldMetadata.Name;
-                int UIType = FieldMetadata.UIType;
-                string Reference = FieldMetadata.Reference;
+                string DataType = Field_MetaData.Format;
+                string Name = Field_MetaData.FieldID;
+                long? UIType = null;
+                if (Field_MetaData != null && Field_MetaData.UIType != null && Field_MetaData.UIType.ID != null)
+                {
+                    UIType = Field_MetaData.UIType.ID;
+                }
+                string Reference = null;
+                if (Field_MetaData != null
+                            && Field_MetaData.TypeSpecificFields != null
+                            && Field_MetaData.TypeSpecificFields.ReferenceToResourceType != null
+                    )
+                {
+                    Reference = Field_MetaData.TypeSpecificFields.ReferenceToResourceType;
+                }
+
+
 
                 if (generateCustomFields == false && Name.Contains("TSA"))
                 {
@@ -407,9 +527,9 @@ namespace Pepperi.ModelGenerator
                 {
                     sbReport.AppendFormat("No data type for class {0} DataType={1} Name= {2} UIType={3} \r\n",
                         clasName,
-                        FieldMetadata.DataType == null ? "null" : FieldMetadata.DataType,
-                        FieldMetadata.Name == null ? "null" : FieldMetadata.Name,
-                        FieldMetadata.UIType
+                        DataType == null ? "null" : DataType,
+                        Name == null ? "null" : Name,
+                        UIType == null ? "null" : UIType.ToString()
                     );
 
                     //skip properties without data type:    eg, PriceLevel in account or SpecialPriceLevel in account
@@ -417,9 +537,10 @@ namespace Pepperi.ModelGenerator
                 }
 
 
-                if (Reference == "images")
+                //if (Reference == "images")
+                if (UIType == 20)   //Image
                 {
-                    sbCode.AppendLine("\t\t public Image " +  Name + " \t{get; set; }");  //eg, publc Image Image2 { get; set; }
+                    sbCode.AppendLine("\t\t public Image " + Name + " \t{get; set; }");  //eg, publc Image Image2 { get; set; }
                 }
 
                 else
@@ -469,10 +590,6 @@ namespace Pepperi.ModelGenerator
         #endregion
 
     }
-
-   
-
-    
 }
 
 

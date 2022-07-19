@@ -16,5 +16,7 @@ namespace Pepperi.SDK.Model
 		 public Boolean? Hidden 	{get; set; }
 		 public Int64? InternalID 	{get; set; }
 		 public Boolean? IsActive 	{get; set; }
+		 public DateTime? ModificationDateTime 	{get; set; }
+		 public Guid? UUID 	{get; set; }
 	}
 }

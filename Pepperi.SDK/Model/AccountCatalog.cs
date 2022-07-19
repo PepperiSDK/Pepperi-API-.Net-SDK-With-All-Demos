@@ -9,10 +9,9 @@ namespace Pepperi.SDK.Model
 {
 	public class AccountCatalog
 	{
-		 public String AccountExternalID 	{get; set; }
-		 public String CatalogExternalID 	{get; set; }
+		 public DateTime? CreationDateTime 	{get; set; }
 		 public Boolean? Hidden 	{get; set; }
-		 public String PriceListExternalID 	{get; set; }
+		 public DateTime? ModificationDateTime 	{get; set; }
 		 public Reference<Account> Account { get; set; }
 		 public Reference<Catalog> Catalog { get; set; }
 	}

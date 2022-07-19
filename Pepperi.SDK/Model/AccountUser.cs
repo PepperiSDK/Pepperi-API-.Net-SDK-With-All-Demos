@@ -9,9 +9,10 @@ namespace Pepperi.SDK.Model
 {
 	public class AccountUser
 	{
-		 public String AccountExternalID 	{get; set; }
+		 public Boolean? ConnectedWithFullAccountAccess 	{get; set; }
+		 public DateTime? CreationDateTime 	{get; set; }
 		 public Boolean? Hidden 	{get; set; }
-		 public String UserExternalID 	{get; set; }
+		 public DateTime? ModificationDateTime 	{get; set; }
 		 public Reference<Account> Account { get; set; }
 		 public Reference<User> User { get; set; }
 	}

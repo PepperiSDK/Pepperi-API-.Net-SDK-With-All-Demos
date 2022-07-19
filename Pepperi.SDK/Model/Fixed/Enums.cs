@@ -77,4 +77,10 @@ namespace Pepperi.SDK.Model.Fixed
         TypeSafeAttributeConfigSingleStringValueFromList = 7,
         TypeSafeAttributeConfigMultiStringValuesFromList = 8
     }
+
+    public enum ePepperiAuditLogStatus
+    {
+        Succeeded = 1,
+        InProgress = 2
+    }
 }

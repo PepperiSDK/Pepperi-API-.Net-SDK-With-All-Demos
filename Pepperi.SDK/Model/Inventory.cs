@@ -11,7 +11,7 @@ namespace Pepperi.SDK.Model
 	{
 		 public Double? InStockQuantity 	{get; set; }
 		 public Int64? InternalID 	{get; set; }
-		 public String ItemExternalID 	{get; set; }
+		 public DateTime? ModificationDateTime 	{get; set; }
 		 public Reference<Item> Item { get; set; }
 	}
 }

@@ -137,8 +137,8 @@ namespace Pepperi.Demo.Console
 
             #region Item Images
 
-            if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("uploading 5 images ...."); }
-            UploadImagesForItems(5);
+            //if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("uploading 5 images ...."); }
+            //UploadImagesForItems(5);
 
             #endregion
 
@@ -196,7 +196,7 @@ namespace Pepperi.Demo.Console
 
 
             model.ExternalID = "ExternalID_" + randomString;
-            model.MainCategoryID = "Category_" + calc_Block_index(index, numberOfElements, numberOfElements / 10).ToString();             //Category will be created.     Change the Category every 0.1 of the items
+            model.MainCategory = "Category_" + calc_Block_index(index, numberOfElements, numberOfElements / 10).ToString();             //Category will be created.     Change the Category every 0.1 of the items
 
 
             model.LongDescription = "LongDescription_" + randomString;
@@ -321,9 +321,9 @@ namespace Pepperi.Demo.Console
             //Link to price list
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.PriceListExternalID = PriceList.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.PriceListExternalID = PriceList.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.PriceList = new Reference<PriceList>();
                     model.PriceList.Data = new PriceList();
@@ -342,9 +342,9 @@ namespace Pepperi.Demo.Console
             //Link to item
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.ItemExternalID = Item.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.ItemExternalID = Item.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Item = new Reference<Item>();
                     model.Item.Data = new Item();
@@ -421,9 +421,9 @@ namespace Pepperi.Demo.Console
             //Link to item
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.ItemExternalID = Item.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.ItemExternalID = Item.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Item = new Reference<Item>();
                     model.Item.Data = new Item();
@@ -504,9 +504,9 @@ namespace Pepperi.Demo.Console
 
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.PriceListExternalID = PriceList.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.PriceListExternalID = PriceList.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.PriceList = new Reference<PriceList>();
                     model.PriceList.Data = new PriceList();
@@ -606,9 +606,9 @@ namespace Pepperi.Demo.Console
             //Link to Account
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.AccountExternalID = Account.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.AccountExternalID = Account.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Account = new Reference<Account>();
                     model.Account.Data = new Account();
@@ -728,9 +728,9 @@ namespace Pepperi.Demo.Console
             //Link to Account
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.AccountExternalID = Account.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.AccountExternalID = Account.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Account = new Reference<Account>();
                     model.Account.Data = new Account();
@@ -770,7 +770,7 @@ namespace Pepperi.Demo.Console
             model.ShipToStreet = "ShipToStreet_" + randomString;
             model.ShipToZipCode = "ShipToZipCode_" + randomString;
             model.Status = (int)eStatus.InCreation;
-            model.TotalItemsCount = generateRandomDouble(100, 300, 2);
+            //model.TotalItemsCount = generateRandomDouble(100, 300, 2);
 
             return model;
         }
@@ -843,9 +843,9 @@ namespace Pepperi.Demo.Console
             //Link to Transaction
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.TransactionExternalID = Transaction.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.TransactionExternalID = Transaction.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Transaction = new Reference<Transaction>();
                     model.Transaction.Data = new Transaction();
@@ -992,9 +992,9 @@ namespace Pepperi.Demo.Console
             Contact Contact = PepperiDbContext.GetRandomContact_OfAccount(Account.ExternalID);
             switch (DataGeneratorLinkMethod)
             {
-                case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                    model.ContactPersonExternalID = Contact.ExternalID;
-                    break;
+                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                //    model.ContactPersonExternalID = Contact.ExternalID;
+                //    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.ContactPerson = new Reference<Contact>();
                     model.ContactPerson.Data = new Contact();
@@ -1248,7 +1248,7 @@ namespace Pepperi.Demo.Console
 
         public Contact GetRandomContact_OfAccount(string AccountExternalID)
         {
-            IEnumerable<Contact> AccountContacts = this.Contacts.Where(contact => contact.AccountExternalID == AccountExternalID);
+            IEnumerable<Contact> AccountContacts = this.Contacts;//.Where(contact => contact.AccountExternalID == AccountExternalID);
 
             if (AccountContacts == null || AccountContacts.Count() == 0)
             {

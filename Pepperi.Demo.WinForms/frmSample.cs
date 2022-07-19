@@ -24,7 +24,7 @@ namespace WindowsFormsApp1
         private string CompanyToken = "";
         private string APIBaseAddress = "https://api.pepperi.com/v1.0/";
         PepperiLogger Logger = new PepperiLogger();
-
+        private string schecma = "";
 
         public frmSample()
         {
@@ -73,7 +73,8 @@ namespace WindowsFormsApp1
                 txtToken.Text = token.APIToken;
                 System.IO.File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt", token.APIToken);
                 auth = new PrivateAuthentication(DeveloperKey, token.APIToken);
-                client = new ApiClient(APIBaseAddress, auth, Logger);
+                var authentificationManager = new AuthentificationManager(Logger, token.APIToken, DeveloperKey);
+                client = new ApiClient(APIBaseAddress, auth, Logger, authentificationManager);
                 MessageBox.Show("Connected!");
             }
             catch(Exception ex)
@@ -92,7 +93,38 @@ namespace WindowsFormsApp1
                 txtToken.Text = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt");
                 CompanyToken = txtToken.Text;
                 auth = new Pepperi.SDK.PrivateAuthentication(DeveloperKey, CompanyToken);
-                client = new ApiClient(APIBaseAddress, auth, new PepperiLogger());
+                var authentificationManager = new AuthentificationManager(Logger, CompanyToken, DeveloperKey);
+                client = new ApiClient(APIBaseAddress, auth, new PepperiLogger(), authentificationManager);
+            }
+        }
+
+        private void btnUploadUdc_Click(object sender, EventArgs e)
+        {
+            schecma = Microsoft.VisualBasic.Interaction.InputBox("What is the schema name?", "Schema Name", schecma);
+            openFileDialog1.ShowDialog();
+            string file = openFileDialog1.FileName;
+            if(file!= "openFileDialog1" && schecma!="")
+            {
+                UDC_UploadFile_Result response = client.UserDefinedCollections.BulkUploadFile(schecma, file);
+                string message = "";
+                if (response.TotalFailed == 0)
+                {
+                    message = "All lines were uploaded successfully!";
+                }
+                else
+                {
+                    message = "NOT all lines were uploaded successfully, some failed. See details in the below table.";
+                    dataGridView1.DataSource = (List<UDC_UploadFile_Row>)response.FailedRows;
+                }
+
+                MessageBox.Show(message + Environment.NewLine
+                    + "number of lines inserted is:  " + response.TotalInserted + Environment.NewLine
+                    + "number of lines updated is:  " + response.TotalUpdated + Environment.NewLine
+                    + "number of lines ignored is:  " + response.TotalIgnored);
+            }
+            else
+            {
+                MessageBox.Show("select file and schema!");
             }
         }
     }

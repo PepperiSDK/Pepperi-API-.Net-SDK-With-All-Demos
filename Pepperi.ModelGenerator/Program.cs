@@ -13,10 +13,6 @@ namespace Pepperi.ModelGenerator
     {
         static void Main(string[] args)
         {
-
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
-                        | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
-            
             #region create apiClient instance
 
             ILogger Logger = Factory.GetLogger();
@@ -35,9 +31,10 @@ namespace Pepperi.ModelGenerator
             #region Generate Models Code
 
             bool ShouldGenerateCustomFields = Ask_ShouldGenerateCustomFields();
+            bool ShouldGenerateUDC = Ask_ShouldGenerateUDC();
 
             ModelGenerator ModelGenerator = new ModelGenerator(ApiClient);
-            ModelGenerator.GenerateModelsCode("Pepperi.SDK.Model", ModelDirectory, ShouldGenerateCustomFields);
+            ModelGenerator.GenerateModelsCode("Pepperi.SDK.Model", ModelDirectory, ShouldGenerateCustomFields, ShouldGenerateUDC);
 
             #endregion
 
@@ -46,7 +43,7 @@ namespace Pepperi.ModelGenerator
 
         }
 
-       
+
 
         private static bool Ask_ShouldGenerateCustomFields()
         {
@@ -56,6 +53,34 @@ namespace Pepperi.ModelGenerator
             while (userInput != "yes" && userInput != "no")
             {
                 System.Console.WriteLine("enter 'yes' to generate model including user defined fields or 'no' to generate without it");
+
+                userInput = System.Console.ReadLine();
+                if (userInput == "no")
+                {
+                    result = false;
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+
+            return result.Value;
+        }
+
+        private static bool Ask_ShouldGenerateUDC()
+        {
+            return Ask_WithBoolResponse("Enter 'yes' to generate User Defined Collection Model or 'no' to generate without it. Please note, that this requires additional addons to be installed!");
+        }
+
+        private static bool Ask_WithBoolResponse(string message)
+        {
+            bool? result = null;
+
+            string userInput = null;
+            while (userInput != "yes" && userInput != "no")
+            {
+                System.Console.WriteLine(message);
 
                 userInput = System.Console.ReadLine();
                 if (userInput == "no")

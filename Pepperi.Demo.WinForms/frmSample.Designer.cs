@@ -42,6 +42,8 @@
             this.txtToken = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtFilter = new System.Windows.Forms.TextBox();
+            this.btnUploadUdc = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,6 +62,7 @@
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(12, 162);
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1154, 389);
             this.dataGridView1.TabIndex = 1;
@@ -72,7 +75,6 @@
             this.btnViewAcounts.TabIndex = 2;
             this.btnViewAcounts.Text = "View Accounts (Customers)";
             this.btnViewAcounts.UseVisualStyleBackColor = true;
-            this.btnViewAcounts.Click += new System.EventHandler(this.button2_Click);
             // 
             // btnSaveAll
             // 
@@ -170,11 +172,26 @@
             this.txtFilter.TabIndex = 12;
             this.txtFilter.Text = "Name Like \'%A%\'";
             // 
+            // btnUploadUdc
+            // 
+            this.btnUploadUdc.Location = new System.Drawing.Point(437, 89);
+            this.btnUploadUdc.Name = "btnUploadUdc";
+            this.btnUploadUdc.Size = new System.Drawing.Size(243, 64);
+            this.btnUploadUdc.TabIndex = 15;
+            this.btnUploadUdc.Text = "Upload User Defined Collection";
+            this.btnUploadUdc.UseVisualStyleBackColor = true;
+            this.btnUploadUdc.Click += new System.EventHandler(this.btnUploadUdc_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
             // frmSample
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1178, 568);
+            this.Controls.Add(this.btnUploadUdc);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtFilter);
             this.Controls.Add(this.label3);
@@ -191,7 +208,7 @@
             this.Controls.Add(this.btnViewItems);
             this.Name = "frmSample";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Sample Form";
+            this.Text = "Pepperi API Demo";
             this.Load += new System.EventHandler(this.frmSample_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
@@ -215,6 +232,8 @@
         private System.Windows.Forms.TextBox txtToken;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtFilter;
+        private System.Windows.Forms.Button btnUploadUdc;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 

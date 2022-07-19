@@ -10,10 +10,13 @@ namespace Pepperi.SDK.Model
 	public class ItemDimensions2
 	{
 		 public String Code 	{get; set; }
+		 public DateTime? CreationDateTime 	{get; set; }
 		 public String Group 	{get; set; }
 		 public Int64? GroupID 	{get; set; }
 		 public Boolean? Hidden 	{get; set; }
 		 public Int64? InternalID 	{get; set; }
+		 public DateTime? ModificationDateTime 	{get; set; }
 		 public String Name 	{get; set; }
+		 public Int32? SortIndex 	{get; set; }
 	}
 }

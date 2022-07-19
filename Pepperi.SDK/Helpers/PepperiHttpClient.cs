@@ -49,7 +49,7 @@ namespace Pepperi.SDK.Helpers
 
 
         /// <summary>
-        /// Throws relevant exception, according to the status code
+        /// Throws PepperiException exception, according to the response
         /// </summary>
         /// <param name="PepperiHttpClientResponse"></param>
         internal void HandleError(PepperiHttpClientResponse PepperiHttpClientResponse)
@@ -68,9 +68,11 @@ namespace Pepperi.SDK.Helpers
                 ApiException ApiException = PepperiJsonSerializer.DeserializeOne<ApiException>(PepperiHttpClientResponse.Body);
 
                 PepperiException = new PepperiException(
-                    string.Format("{0} (error code ={1})", 
-                            (   ApiException != null && ApiException.fault != null &&  ApiException.fault.faultstring != null) ? ApiException.fault.faultstring : PepperiHttpClientResponse.Body,    //0
-                                ApiException != null && ApiException.fault != null && ApiException.fault.detail != null && ApiException.fault.detail.errorcode!= null ?  ApiException.fault.detail.errorcode : string.Empty 
+                    string.Format("{0} (error code ={1})",
+                            (ApiException != null && ApiException.fault != null && ApiException.fault.faultstring != null) ?    //0 
+                                        ApiException.fault.faultstring :                                                            //0
+                                        PepperiHttpClientResponse.Body != null ? PepperiHttpClientResponse.Body : string.Empty,     //0
+                                ApiException != null && ApiException.fault != null && ApiException.fault.detail != null && ApiException.fault.detail.errorcode != null ? ApiException.fault.detail.errorcode : string.Empty
                     ),
                     ApiException,
                     PepperiHttpClientResponse.HttpStatusCode
@@ -115,14 +117,73 @@ namespace Pepperi.SDK.Helpers
 
 
             //send request
+            HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
             HttpResponseMessage HttpResponseMessage = HttpClient.GetAsync(RequestUri + QueryString).Result;
             string body = HttpResponseMessage.Content.ReadAsStringAsync().Result;
             var ResponseHeaders = this.GetResponseHeaders(HttpResponseMessage);
-                   
+
             //Create result
             var PepperiHttpClientResponse = new PepperiHttpClientResponse(HttpResponseMessage.StatusCode, body, ResponseHeaders);
             return PepperiHttpClientResponse;
         }
+
+
+
+
+        /// <summary>
+        /// put string (eg, json)
+        /// </summary>
+        /// <param name="BaseUri"></param>
+        /// <param name="RequestUri"></param>
+        /// <param name="dicQueryStringParameters"></param>
+        /// <param name="putBody"></param>
+        /// <param name="contentType"></param>
+        /// <param name="accept"></param>
+        /// <returns></returns>
+        internal PepperiHttpClientResponse PutStringContent(
+            string BaseUri,
+            string RequestUri,
+            Dictionary<string, string> dicQueryStringParameters,//where, order by, any other parameters (page, page_size etc)
+            string putBody,
+            string contentType,     //eg, application/json
+            string accept
+        )
+        {
+            var HttpClient = new HttpClient(new LoggingHandler(this.Logger))
+            {
+                BaseAddress = new Uri(BaseUri)
+            };
+
+            //add authentication header (for basic authentiction, Oauth2 etc)
+            AddAuthorizationHeader(HttpClient);
+
+
+            //add: accept header
+            HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
+
+            //add: custom request headers
+            AddAuthenticationCustomRequestHeaders(HttpClient);
+
+
+            //create query string (required by endpoint and authentication)
+            string QueryString = BuildQueryString(dicQueryStringParameters, null);
+
+            //send request
+            StringContent StringContent = new StringContent(putBody, Encoding.UTF8);       //new StringContent(putBody, Encoding.UTF8, "application/json")
+            StringContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);      //add content type header
+            HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
+            HttpResponseMessage HttpResponseMessage = HttpClient.PutAsync(RequestUri + QueryString, StringContent).Result;
+            string body = HttpResponseMessage.Content.ReadAsStringAsync().Result;
+            var ResponseHeaders = this.GetResponseHeaders(HttpResponseMessage);
+
+            //Create result
+            var PepperiHttpClientResponse = new PepperiHttpClientResponse(HttpResponseMessage.StatusCode, body, ResponseHeaders);
+            return PepperiHttpClientResponse;
+        }
+
+
+
+
 
 
 
@@ -160,6 +221,7 @@ namespace Pepperi.SDK.Helpers
             //add: custom request headers
             AddAuthenticationCustomRequestHeaders(HttpClient);
 
+            HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
 
             //create query string (required by endpoint and authentication)
             string QueryString = BuildQueryString(dicQueryStringParameters, null);
@@ -169,6 +231,11 @@ namespace Pepperi.SDK.Helpers
             StringContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);      //add content type header
             HttpResponseMessage HttpResponseMessage = HttpClient.PostAsync(RequestUri + QueryString, StringContent).Result;
             string body = HttpResponseMessage.Content.ReadAsStringAsync().Result;
+
+            // uncomment in case of utf-8 isues
+            //var byteArray = HttpResponseMessage.Content.ReadAsByteArrayAsync().Result;
+            //string body = Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);
+
             var ResponseHeaders = this.GetResponseHeaders(HttpResponseMessage);
 
             //Create result
@@ -201,6 +268,8 @@ namespace Pepperi.SDK.Helpers
             {
                 BaseAddress = new Uri(BaseUri)
             };
+
+            HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
 
             //add authentication header (for basic authentiction, Oauth2 etc)
             AddAuthorizationHeader(HttpClient);
@@ -257,6 +326,8 @@ namespace Pepperi.SDK.Helpers
                 BaseAddress = new Uri(BaseUri)
             };
 
+            HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
+
             //add authentication header (for basic authentiction, Oauth2 etc)
             AddAuthorizationHeader(HttpClient);
 
@@ -311,6 +382,7 @@ namespace Pepperi.SDK.Helpers
             string QueryString = BuildQueryString(dicQueryStringParameters, null);
 
 
+            HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
             //send request
             HttpResponseMessage HttpResponseMessage = HttpClient.DeleteAsync(RequestUri + QueryString).Result;
             string body = HttpResponseMessage.Content.ReadAsStringAsync().Result;
@@ -351,7 +423,7 @@ namespace Pepperi.SDK.Helpers
                     HttpClient.DefaultRequestHeaders.Add(key, value);
                 }
             }
-           
+
         }
 
         private string BuildQueryString(Dictionary<string, string> dicEndpointQueryStringParameters, Dictionary<string, string> dicAuthenticationQeryStringParameters)
@@ -404,7 +476,7 @@ namespace Pepperi.SDK.Helpers
             return result;
         }
 
-        
+
         #endregion
     }
 
@@ -431,7 +503,7 @@ namespace Pepperi.SDK.Helpers
 
     #endregion
 
-    
+
     /// <summary>
     ///responsible for logging HttpClient traffic to the ILogger
     /// </summary>
@@ -449,7 +521,7 @@ namespace Pepperi.SDK.Helpers
         #region Constructor
 
         public LoggingHandler(ILogger Logger)
-            : this(new HttpClientHandler(),Logger)
+            : this(new HttpClientHandler(), Logger)
         {
             this.Logger = Logger;
         }

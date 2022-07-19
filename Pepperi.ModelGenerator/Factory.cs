@@ -49,8 +49,9 @@ namespace Pepperi.ModelGenerator
             string PrivateApplication_ConsumerKey = Settings.PrivateApplication_ConsumerKey;
 
             var IAuthentication = new PrivateAuthentication(PrivateApplication_ConsumerKey, APIToken);
+            var authentificationManager = new AuthentificationManager(Logger, APIToken, PrivateApplication_ConsumerKey);
 
-            ApiClient ApiClient = new ApiClient(ApiBaseUri, IAuthentication, Logger);
+            ApiClient ApiClient = new ApiClient(ApiBaseUri, IAuthentication, Logger, AuthentificationManager: authentificationManager);
 
             return ApiClient;
         }
