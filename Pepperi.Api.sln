@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepperi.Test.MVC", "Pepperi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepperi.Demo.Console", "Pepperi.Demo.Console\Pepperi.Demo.Console.csproj", "{44832286-07EC-4C1C-9D2C-35F1D62A57E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormSample", "Pepperi.Demo.WinForms\WinFormSample.csproj", "{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepperi.Demo.WinForms", "Pepperi.Demo.WinForms\Pepperi.Demo.WinForms.csproj", "{6B1410A6-5104-4C3E-905A-B2DD9D2155E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,5 +42,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3BCF58EB-354B-414B-AFDF-775A3C2148FE}
 	EndGlobalSection
 EndGlobal

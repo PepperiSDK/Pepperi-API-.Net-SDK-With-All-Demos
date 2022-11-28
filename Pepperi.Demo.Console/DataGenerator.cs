@@ -3,11 +3,13 @@ using Pepperi.SDK.Contracts;
 using Pepperi.SDK.Exceptions;
 using Pepperi.SDK.Model;
 using Pepperi.SDK.Model.Fixed;
+using Pepperi.Demo.Console.Model.TestModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Pepperi.Demo.Console
 {
@@ -41,7 +43,7 @@ namespace Pepperi.Demo.Console
 
         #region Public methods
 
-        public PepperiDbContext GenerateAndUploadData(DataQuatities DataQuatities)
+        public PepperiDbContext GenerateAndUploadData(DataQuatities DataQuatities, DataGeneratorOptions dataGeneratorOptions)
         {
             GetBulkJobInfoResponse GetBulkJobInfoResponse = null;
 
@@ -142,6 +144,12 @@ namespace Pepperi.Demo.Console
 
             #endregion
 
+            #region User Defined Collection
+
+            if (dataGeneratorOptions.ShouldGenerateUDC)
+                GenerateAndUploadUDC_Data(DataQuatities.generate_X_UserDefinedTableDocuments);
+
+            #endregion
 
             if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("finished uploading all data successfully!"); }
 
@@ -196,7 +204,7 @@ namespace Pepperi.Demo.Console
 
 
             model.ExternalID = "ExternalID_" + randomString;
-            model.MainCategory = "Category_" + calc_Block_index(index, numberOfElements, numberOfElements / 10).ToString();             //Category will be created.     Change the Category every 0.1 of the items
+            model.MainCategoryID = "Category_" + calc_Block_index(index, numberOfElements, numberOfElements / 10).ToString();             //Category will be created.     Change the Category every 0.1 of the items
 
 
             model.LongDescription = "LongDescription_" + randomString;
@@ -321,9 +329,9 @@ namespace Pepperi.Demo.Console
             //Link to price list
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.PriceListExternalID = PriceList.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.PriceListExternalID = PriceList.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.PriceList = new Reference<PriceList>();
                     model.PriceList.Data = new PriceList();
@@ -342,9 +350,9 @@ namespace Pepperi.Demo.Console
             //Link to item
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.ItemExternalID = Item.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.ItemExternalID = Item.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Item = new Reference<Item>();
                     model.Item.Data = new Item();
@@ -421,9 +429,9 @@ namespace Pepperi.Demo.Console
             //Link to item
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.ItemExternalID = Item.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.ItemExternalID = Item.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Item = new Reference<Item>();
                     model.Item.Data = new Item();
@@ -504,9 +512,9 @@ namespace Pepperi.Demo.Console
 
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.PriceListExternalID = PriceList.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.PriceListExternalID = PriceList.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.PriceList = new Reference<PriceList>();
                     model.PriceList.Data = new PriceList();
@@ -606,9 +614,9 @@ namespace Pepperi.Demo.Console
             //Link to Account
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.AccountExternalID = Account.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.AccountExternalID = Account.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Account = new Reference<Account>();
                     model.Account.Data = new Account();
@@ -658,15 +666,16 @@ namespace Pepperi.Demo.Console
         {
             //for Transaction, the url of the BulkUpload must include the SUBTypeID of transaction
             //Pick Random Transaction sub type ID from the concrete types
-            TypeMetadata TypeMetadata = ApiClient.Transactions.GetSubTypesMetadata().FirstOrDefault();
-            if (TypeMetadata == null || TypeMetadata.SubTypeID == null)
+
+            var Type_MetaData = ApiClient.TransactionsMetaData.GetTypes().FirstOrDefault();
+            if (Type_MetaData == null || Type_MetaData.TypeID == null)
             {
                 throw new PepperiException("No subtypes for transction.");
             }
 
 
             List<string> fieldsToUpload = new List<string>() { "ExternalID", "AccountExternalID", "ActionDateTime", "BillToCity", "BillToCountry", "BillToFax", "BillToName", "BillToPhone", "BillToState", "BillToStreet", "BillToZipCode", "Remark", "ShipToCity", "ShipToCountry", "ShipToFax", "ShipToName", "ShipToPhone", "ShipToState", "ShipToStreet", "ShipToZipCode", "Status", "TotalItemsCount" };
-            var BulkUploadResponse = ApiClient.Transactions.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true, TypeMetadata.SubTypeID);
+            var BulkUploadResponse = ApiClient.Transactions.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true, Type_MetaData.TypeID.ToString());
             GetBulkJobInfoResponse GetBulkJobInfoResponse = ApiClient.Transactions.WaitForBulkJobToComplete(BulkUploadResponse.JobID);
 
             //note: we do not validate result here 
@@ -728,9 +737,9 @@ namespace Pepperi.Demo.Console
             //Link to Account
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.AccountExternalID = Account.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.AccountExternalID = Account.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Account = new Reference<Account>();
                     model.Account.Data = new Account();
@@ -804,16 +813,16 @@ namespace Pepperi.Demo.Console
         public GetBulkJobInfoResponse UploadAsBulk(IEnumerable<TransactionLine> models)
         {
             //for TransactionLines, the url of the BulkUpload must include the SUBTypeID of transaction
-            //Pick Random Transaction sub type ID from the concrete types
-            TypeMetadata TypeMetadata = ApiClient.Transactions.GetSubTypesMetadata().FirstOrDefault();
-            if (TypeMetadata == null || TypeMetadata.SubTypeID == null)
+            //Pick Random Transaction sub type ID from the concrete 
+            var Type_Metadata = ApiClient.TransactionsMetaData.GetTypes().FirstOrDefault();
+            if (Type_Metadata == null || Type_Metadata.TypeID == null)
             {
                 throw new PepperiException("No subtypes for transction.");
             }
 
 
             List<string> fieldsToUpload = new List<string>() { "TransactionExternalID", "ItemExternalID", "LineNumber", "UnitPriceAfterDiscount", "UnitsQuantity" };
-            var BulkUploadResponse = ApiClient.TransactionLines.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true, TypeMetadata.SubTypeID);
+            var BulkUploadResponse = ApiClient.TransactionLines.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true, Type_Metadata.TypeID.ToString());
             GetBulkJobInfoResponse GetBulkJobInfoResponse = ApiClient.TransactionLines.WaitForBulkJobToComplete(BulkUploadResponse.JobID);
 
             //note: we do not validate result here 
@@ -843,9 +852,9 @@ namespace Pepperi.Demo.Console
             //Link to Transaction
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.TransactionExternalID = Transaction.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.TransactionExternalID = Transaction.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.Transaction = new Reference<Transaction>();
                     model.Transaction.Data = new Transaction();
@@ -918,15 +927,16 @@ namespace Pepperi.Demo.Console
         {
             //for Activity, the url of the BulkUpload must include the SUBTypeID of activity
             //Pick Random Activity sub type ID from the concrete types
-            TypeMetadata TypeMetadata = ApiClient.Activities.GetSubTypesMetadata().FirstOrDefault();
-            if (TypeMetadata == null || TypeMetadata.SubTypeID == null)
+
+            var Type_Metadata = ApiClient.ActivitiesMetaData.GetTypes().FirstOrDefault();
+            if (Type_Metadata == null || Type_Metadata.TypeID == null)
             {
                 throw new PepperiException("No subtypes for activity.");
             }
 
 
             List<string> fieldsToUpload = new List<string>() { "ExternalID", "AccountExternalID", "ContactPersonExternalID", "ActionDateTime", "Title", "Status" };
-            var BulkUploadResponse = ApiClient.Activities.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true, TypeMetadata.SubTypeID);
+            var BulkUploadResponse = ApiClient.Activities.BulkUpload(models, eOverwriteMethod.full, eBulkUploadMethod.Zip, fieldsToUpload, true, Type_Metadata.TypeID.ToString());
             GetBulkJobInfoResponse GetBulkJobInfoResponse = ApiClient.Activities.WaitForBulkJobToComplete(BulkUploadResponse.JobID);
 
             //note: we do not validate result here 
@@ -989,12 +999,12 @@ namespace Pepperi.Demo.Console
             }
 
             //Link to Contact
-            Contact Contact = PepperiDbContext.GetRandomContact_OfAccount(Account.ExternalID);
+            Contact Contact = PepperiDbContext.GetRandomContact_OfAccount(Account.ExternalID, DataGeneratorLinkMethod);
             switch (DataGeneratorLinkMethod)
             {
-                //case eDataGeneratorLinkMethod.use_ExternalID_Property:
-                //    model.ContactPersonExternalID = Contact.ExternalID;
-                //    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    model.ContactPersonExternalID = Contact.ExternalID;
+                    break;
                 case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
                     model.ContactPerson = new Reference<Contact>();
                     model.ContactPerson.Data = new Contact();
@@ -1023,43 +1033,108 @@ namespace Pepperi.Demo.Console
         #endregion
 
 
-        //#region Item Images
+        #region Item Images
 
-        //private void UploadImagesForItems(int numberOfItems)
-        //{
-        //    for (int i = 0; i < numberOfItems; i++)
-        //    {
-        //        if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("uploading image for item external id: " + PepperiDbContext.Items[i].ExternalID); }
-        //        UploadImageForItem(PepperiDbContext.Items[i]);
-        //    }
-        //}
+        private void UploadImagesForItems(int numberOfItems)
+        {
+            for (int i = 0; i < numberOfItems; i++)
+            {
+                if (On_DataGenerator_Progress != null) { On_DataGenerator_Progress("uploading image for item external id: " + PepperiDbContext.Items[i].ExternalID); }
+                UploadImageForItem(PepperiDbContext.Items[i]);
+            }
+        }
 
-        //private void UploadImageForItem(Item ItemFromContext)
-        //{
-        //    string Image1_UploadUrl = "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg";
-        //    byte[] Image1_AsByteArray = null;
-        //    using (var wc = new System.Net.WebClient())
-        //    {
-        //        Image1_AsByteArray = wc.DownloadData(Image1_UploadUrl);
-        //    }
+        private void UploadImageForItem(Item ItemFromContext)
+        {
+            string Image1_UploadUrl = "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg";
+            byte[] Image1_AsByteArray = null;
+            using (var wc = new System.Net.WebClient())
+            {
+                Image1_AsByteArray = wc.DownloadData(Image1_UploadUrl);
+            }
 
-        //    string Image1_AsBase64String = Convert.ToBase64String(Image1_AsByteArray);
+            string Image1_AsBase64String = Convert.ToBase64String(Image1_AsByteArray);
 
 
-        //    Item Item = new Item();
-        //    Item.ExternalID = ItemFromContext.ExternalID;
+            Item Item = new Item();
+            Item.ExternalID = ItemFromContext.ExternalID;
 
-        //    Item.Image = new Image();
-        //    Item.Image.URL = Image1_UploadUrl;
+            Item.Image = new Image();
+            Item.Image.URL = Image1_UploadUrl;
 
-        //    Item.Image2 = new Image();
-        //    Item.Image2.URL = Image1_UploadUrl;
+            Item.Image2 = new Image();
+            Item.Image2.URL = Image1_UploadUrl;
 
-        //    Item UpsertResponse2 = ApiClient.Items.Upsert(Item);
-        //}
+            Item UpsertResponse2 = ApiClient.Items.Upsert(Item);
+        }
 
-        //#endregion
+        #endregion
 
+        #region User Defined Collections
+
+        private UDC_UploadFile_Result GenerateAndUploadUDC_Data(int size)
+        {
+            LogProgress("Generating UDC Collection Data...");
+            var testUdc = GenerateTestUDC_Data(size);
+            LogProgress("Uploading UDC Data...");
+            var uploadResponse = UploadTestUDC_Data(testUdc);
+            LogProgress("Finished UDC Data Upload!\n");
+
+            return uploadResponse;
+        }
+
+        private IEnumerable<TestUDC> GenerateTestUDC_Data(int size, eRandomMethod RandomMethod = eRandomMethod.useIndex)
+        {
+            var result = new List<TestUDC>();
+
+            for (int i = 0; i < size; i++)
+            {
+                var index = RandomMethod == eRandomMethod.useIndex ? i.ToString() : Guid.NewGuid().ToString();
+                result.Add(new TestUDC
+                {
+                    key = "testKey_" + index,
+                    testIntegerField = generateRandomInt(0, 100),
+                    testDoubleField = generateRandomDouble(0, 100, 2),
+                    testBoolField = generateRandomBoolean(),
+                    testDateTimeField = generateUTCDateTime(generateRandomInt(1, 10), generateRandomInt(1, 1000)),
+                    testStringArrayField = generateStringArray(2, $"testStringArray_{index}"),
+                    testIntegerArrayField = generateRandomIntegerArray(2, 0, 100)
+                });
+            }
+            return result;
+        }
+
+        private UDC_UploadFile_Result UploadTestUDC_Data(IEnumerable<TestUDC> data)
+        {
+            try
+            {
+                var jsonData = JsonConvert.SerializeObject(
+                                        data,
+                                        Formatting.None,
+                                        new JsonSerializerSettings
+                                        {
+                                            NullValueHandling = NullValueHandling.Ignore,
+                                            DateTimeZoneHandling = DateTimeZoneHandling.Utc //will serialize date time as utc
+                                        });
+                var uploadedResponse = ApiClient.UserDefinedCollections.BulkUploadViaFileApi("MyTestCollection", jsonData);
+
+                PepperiDbContext.TestUDC = data;
+
+                LogProgress($"Upload was Finished!");
+                LogProgress($"Total Number of Documents: {uploadedResponse.Total}");
+                LogProgress($"Total Failed: {uploadedResponse.TotalFailed}");
+                LogProgress($"Total Ignored: {uploadedResponse.TotalIgnored}");
+                LogProgress($"Total Inserted: {uploadedResponse.TotalInserted}");
+                LogProgress($"Total Updated: {uploadedResponse.TotalUpdated}");
+                return uploadedResponse;
+            }
+            catch (Exception e)
+            {
+                return new UDC_UploadFile_Result { Message = e?.Message ?? "No Message" };
+            }
+        }
+
+        #endregion
 
         #region private helpers
 
@@ -1095,6 +1170,44 @@ namespace Pepperi.Demo.Console
             return result;
         }
 
+        private bool generateRandomBoolean()
+        {
+            return Random.Next() > (Int32.MaxValue / 2);
+        }
+
+        private IEnumerable<string> generateStringArray(int size, string prefix)
+        {
+            var result = new List<string>();
+            for (int i = 0; i < size; i++)
+            {
+                result.Add($"{prefix}_{i}");
+            }
+            return result;
+        }
+
+        private IEnumerable<long> generateRandomIntegerArray(int size, int min, int max)
+        {
+            var result = new List<long>();
+            for (int i = 0; i < size; i++)
+            {
+                result.Add(generateRandomInt(min, max));
+            }
+            return result;
+        }
+
+        private bool Validate<T>(T value, string message) where T : class
+        {
+            if (value == null)
+                throw new PepperiException(message);
+            return true;
+        }
+
+        private bool Validate(bool? value, string message)
+        {
+            if (value != true)
+                throw new PepperiException(message);
+            return true;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1174,6 +1287,10 @@ namespace Pepperi.Demo.Console
             return currentBlock;
         }
 
+        private void LogProgress(string message)
+        {
+            On_DataGenerator_Progress?.Invoke(message);
+        }
         #endregion
 
     }
@@ -1184,6 +1301,8 @@ namespace Pepperi.Demo.Console
     /// </summary>
     /// <param name="message"></param>
     public delegate void On_DataGenerator_Progress(string message);
+
+
 
     /// <summary>
     /// holds the data stored in Pepperi by Bulk or single Api
@@ -1207,6 +1326,7 @@ namespace Pepperi.Demo.Console
         public List<Transaction> Transactions { get; set; }
         public List<TransactionLine> TransactionLines { get; set; }
 
+        public IEnumerable<TestUDC> TestUDC { get; set; }
         #endregion
 
 
@@ -1246,9 +1366,21 @@ namespace Pepperi.Demo.Console
 
         }
 
-        public Contact GetRandomContact_OfAccount(string AccountExternalID)
+        public Contact GetRandomContact_OfAccount(string AccountExternalID, eDataGeneratorLinkMethod DataGeneratorLinkMethod)
         {
-            IEnumerable<Contact> AccountContacts = this.Contacts;//.Where(contact => contact.AccountExternalID == AccountExternalID);
+            IEnumerable<Contact> AccountContacts;
+
+            switch (DataGeneratorLinkMethod)
+            {
+                case eDataGeneratorLinkMethod.use_ExternalID_Property:
+                    AccountContacts = this.Contacts.Where(contact => contact.AccountExternalID == AccountExternalID);
+                    break;
+                case eDataGeneratorLinkMethod.use_ExternalID_of_reference:
+                    AccountContacts = this.Contacts.Where(contact => contact?.Account?.Data?.ExternalID != null && contact.Account.Data.ExternalID == AccountExternalID);
+                    break;
+                default:
+                    throw new Exception("UnexpectedLinkMode");
+            }
 
             if (AccountContacts == null || AccountContacts.Count() == 0)
             {
@@ -1321,6 +1453,13 @@ namespace Pepperi.Demo.Console
         public int generate_X_transactionsPerAccount { get; set; }
         public short generate_X_transactionLinesPerTransaction { get; set; }
         public int generate_X_activitierPerAccount { get; set; }
+
+        public int generate_X_UserDefinedTableDocuments { get; set; }
+    }
+
+    public class DataGeneratorOptions
+    {
+        public bool ShouldGenerateUDC { get; set; }
     }
 
     public enum eDataGeneratorLinkMethod

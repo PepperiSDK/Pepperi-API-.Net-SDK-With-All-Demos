@@ -225,7 +225,8 @@ namespace Pepperi.ModelGenerator
             {
                 case eModelClassName.Account:
                     {
-                        result = ApiClient.AccountsMetaData.GetFields();
+                        // Workaround for PriceListExternalID
+                        result = CheckAddExternalField(ApiClient.AccountsMetaData.GetFields(), "PriceListExternalID");
                         break;
                     }
 
@@ -249,7 +250,8 @@ namespace Pepperi.ModelGenerator
 
                 case eModelClassName.Activity:
                     {
-                        result = ApiClient.ActivitiesMetaData.GetFields();
+                        // Workaround for ContactPersonExternalID
+                        result = CheckAddExternalField(ApiClient.ActivitiesMetaData.GetFields(), "ContactPersonExternalID");
                         break;
                     }
 
@@ -261,18 +263,21 @@ namespace Pepperi.ModelGenerator
 
                 case eModelClassName.Contact:
                     {
-                        result = ApiClient.ContactsMetaData.GetFields();
+                        // Workaround for AccountExternalID
+                        result = CheckAddExternalField(ApiClient.ContactsMetaData.GetFields(), "AccountExternalID");
                         break;
                     }
                 case eModelClassName.Inventory:
                     {
-                        result = ApiClient.InventoryMetaData.GetFields();
+                        // Workaround for ItemExternalID
+                        result = CheckAddExternalField(ApiClient.InventoryMetaData.GetFields(), "ItemExternalID");
                         break;
                     }
 
                 case eModelClassName.Item:
                     {
-                        result = ApiClient.ItemsMetaData.GetFields();
+                        // Workaround for MainCategoryID
+                        result = CheckAddExternalField(ApiClient.ItemsMetaData.GetFields(), "MainCategoryID");
                         break;
                     }
 
@@ -296,7 +301,18 @@ namespace Pepperi.ModelGenerator
 
                 case eModelClassName.ItemPrice:
                     {
-                        result = ApiClient.ItemPricesMetaData.GetFields();
+                        // Workaround for ItemExternalID, PriceListExternalID
+                        var additionalFields = new List<Field_MetaData>{
+                            new Field_MetaData {
+                                FieldID = "ItemExternalID",
+                                Format = "String"
+                            },
+                            new Field_MetaData {
+                                FieldID = "PriceListExternalID",
+                                Format = "String"
+                            }
+                        };
+                        result = CheckAddExternalFields(ApiClient.ItemPricesMetaData.GetFields(), additionalFields);
                         break;
                     }
 
@@ -309,13 +325,15 @@ namespace Pepperi.ModelGenerator
 
                 case eModelClassName.Transaction:
                     {
-                        result = ApiClient.TransactionsMetaData.GetFields();
+                        // Workaround for AccountExternalID
+                        result = CheckAddExternalField(ApiClient.TransactionsMetaData.GetFields(), "AccountExternalID");
                         break;
                     }
 
                 case eModelClassName.TransactionLine:
                     {
-                        result = ApiClient.TransactionLinesMetaData.GetFields();
+                        // Workaround for TransactionExternalID
+                        result = CheckAddExternalField(ApiClient.TransactionLinesMetaData.GetFields(), "TransactionExternalID");
                         break;
                     }
 
@@ -357,6 +375,26 @@ namespace Pepperi.ModelGenerator
 
         }
 
+        private IEnumerable<Field_MetaData> CheckAddExternalField(IEnumerable<Field_MetaData> fields, string fieldName, string returnFormat = "String")
+        {
+            return CheckAddExternalFields(fields, new List<Field_MetaData>{
+                new Field_MetaData {
+                    FieldID = fieldName,
+                    Format = returnFormat
+                }
+            });
+        }
+
+        private IEnumerable<Field_MetaData> CheckAddExternalFields(IEnumerable<Field_MetaData> fields, IEnumerable<Field_MetaData> fieldsToAdd)
+        {
+            if (fieldsToAdd == null || fieldsToAdd.Count() == 0) return fields;
+
+            var uniqueFields = fieldsToAdd.Where(fieldToAdd => fields.Where(field => field.FieldID == fieldToAdd.FieldID).Count() == 0);
+
+            if (uniqueFields.Count() == 0) return fields;
+
+            return fields.Concat(uniqueFields);
+        }
 
         private string GenerateCodeForUserDefinedCollections(string modelNamespace)
         {
@@ -384,7 +422,7 @@ namespace Pepperi.ModelGenerator
             return sbCode.ToString();
         }
 
-        private string GenerateCodeForUserDefinedCollection(UserDefinedCollection_MetaData scheme)
+        private string GenerateCodeForUserDefinedCollection(UDC_MetaData scheme)
         {
             var schemeName = scheme.Name;
             var className = $"UserDefinedCollection_{schemeName}";
@@ -400,6 +438,13 @@ namespace Pepperi.ModelGenerator
                 sbCode.AppendLine(GenerateCodeForUserDefinedField(field.Key, field.Value));
             }
 
+            // Hidden Field
+            GenerateCodeForUserDefinedField("Hidden", new UDC_Meta_Field()
+            {
+                Type = "Boolean",
+                Mandatory = false
+            });
+
             sbCode.AppendLine("\t}"); //close the class
 
 
@@ -407,7 +452,7 @@ namespace Pepperi.ModelGenerator
             return classSourceCode;
         }
 
-        private string GenerateCodeForUserDefinedField(string fieldName, UserDefinedCollection_Field field)
+        private string GenerateCodeForUserDefinedField(string fieldName, UDC_Meta_Field field)
         {
             var dataType = field.Type;
             if (dataType == null || dataType.Trim().Length == 0)

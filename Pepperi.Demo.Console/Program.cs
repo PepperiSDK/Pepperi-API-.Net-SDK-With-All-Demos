@@ -203,7 +203,7 @@ namespace Pepperi.Demo.Console
             bool? useDefaultDataQuanitites = null;
             while (useDefaultDataQuanitites == null)
             {
-                System.Console.WriteLine("enter 'yes' to generate and upload data in default size or 'no' to select data size");
+                System.Console.WriteLine("enter 'yes' to generate and upload data in default size ('low') or 'no' to select data size");
                 string resultAsString = System.Console.ReadLine();
 
                 if (resultAsString == "yes")
@@ -228,10 +228,10 @@ namespace Pepperi.Demo.Console
 
             while (size == null)
             {
-                System.Console.WriteLine("enter high/mid/low");
+                System.Console.WriteLine("enter high/mid/low/min");
                 string resultAsString = System.Console.ReadLine();
 
-                if (resultAsString == "low" || resultAsString == "mid" || resultAsString == "high")
+                if (resultAsString == "min" || resultAsString == "low" || resultAsString == "mid" || resultAsString == "high")
                 {
                     size = resultAsString;
                 }
@@ -241,6 +241,18 @@ namespace Pepperi.Demo.Console
             DataQuatities DataQuatities = new DataQuatities();
             switch (size)
             {
+                case "min":
+                    {
+                        DataQuatities.generate_X_Item = 2;
+                        DataQuatities.generate_X_PriceList = 2;
+                        DataQuatities.generate_X_accounts = 2;
+                        DataQuatities.generate_X_contactsPerAccount = 2;
+                        DataQuatities.generate_X_transactionsPerAccount = 2;
+                        DataQuatities.generate_X_transactionLinesPerTransaction = 2;
+                        DataQuatities.generate_X_activitierPerAccount = 2;
+                        DataQuatities.generate_X_UserDefinedTableDocuments = 2;
+                        break;
+                    }
                 case "low":
                     {
                         DataQuatities.generate_X_Item = 1000;
@@ -250,6 +262,7 @@ namespace Pepperi.Demo.Console
                         DataQuatities.generate_X_transactionsPerAccount = 10;
                         DataQuatities.generate_X_transactionLinesPerTransaction = 5;
                         DataQuatities.generate_X_activitierPerAccount = 4;
+                        DataQuatities.generate_X_UserDefinedTableDocuments = 10;
                         break;
                     }
                 case "mid":
@@ -261,6 +274,7 @@ namespace Pepperi.Demo.Console
                         DataQuatities.generate_X_transactionsPerAccount = 10;
                         DataQuatities.generate_X_transactionLinesPerTransaction = 10;
                         DataQuatities.generate_X_activitierPerAccount = 10;
+                        DataQuatities.generate_X_UserDefinedTableDocuments = 100;
                         break;
                     }
                 case "high":
@@ -272,6 +286,7 @@ namespace Pepperi.Demo.Console
                         DataQuatities.generate_X_transactionsPerAccount = 10;
                         DataQuatities.generate_X_transactionLinesPerTransaction = 10;
                         DataQuatities.generate_X_activitierPerAccount = 10;
+                        DataQuatities.generate_X_UserDefinedTableDocuments = 1000;
                         break;
                     }
                 default:
@@ -286,12 +301,30 @@ namespace Pepperi.Demo.Console
         {
             System.Console.WriteLine("Generating and Uploading Data...");
             DataGenerator DataGenerator = new DataGenerator(Logger, ApiClient, On_DataGenerator_Progress);
-
-            PepperiDbContext PepperiDbContext = DataGenerator.GenerateAndUploadData(DataQuatities);
+            DataGeneratorOptions dataGeneratorOptions = GetDataGeneratorOptions();
+            PepperiDbContext PepperiDbContext = DataGenerator.GenerateAndUploadData(DataQuatities, dataGeneratorOptions);
 
             System.Console.WriteLine("finished uploading all data successfully!");
 
             return PepperiDbContext;
+        }
+
+        private static DataGeneratorOptions GetDataGeneratorOptions() {
+            var udcConsoleInfo = "\nPlease note, that UDC requires next: \n";
+            udcConsoleInfo += "1) Additional addons to be installed;\n";
+            udcConsoleInfo += "2) UDC Collection: \n";
+            udcConsoleInfo += "2.1) Collection Name: 'MyTestCollection';\n";
+            udcConsoleInfo += "2.2) 'testBoolField' Bool field;\n";
+            udcConsoleInfo += "2.3) 'testDateTimeField' DateTime field;\n";
+            udcConsoleInfo += "2.4) 'testDoubleField' Double field;\n";
+            udcConsoleInfo += "2.5) 'testStringArrayField' Array of String field;\n";
+            udcConsoleInfo += "2.6) 'testIntegerArrayField' Array of Integer field;\n";
+            udcConsoleInfo += "2.7) 'key' string field;\n";
+            System.Console.WriteLine(udcConsoleInfo);
+            var shouldGenerateUDC = ConsoleInteractions.AskWithBoolResponse("Generate UDC Data? ('yes' / 'no')");
+            return new DataGeneratorOptions {
+                ShouldGenerateUDC = shouldGenerateUDC
+            };
         }
 
         private static void On_DataGenerator_Progress(string message)

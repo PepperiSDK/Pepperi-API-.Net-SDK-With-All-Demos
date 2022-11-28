@@ -39,23 +39,92 @@ namespace Pepperi.SDK.Endpoints.Base
         #endregion
 
         #region Public methods
-        public IEnumerable<UserDefinedCollection_MetaData> GetUserDefinedCollections()
+        public IEnumerable<UDC_MetaData> GetUserDefinedCollections()
         {
-            string RequestUri = @"user_defined_collections/schemes";
-            Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
-            string accept = "application/json";
+            var requestUri = $"user_defined_collections/schemes";
+            var response = GetPepperiApi(requestUri);
 
+            return PepperiJsonSerializer.DeserializeCollection<UDC_MetaData>(response.Body);
+        }
+
+        public UDC_MetaData GetUserDefinedCollection(string schemeName)
+        {
+            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
+
+            var requestUri = $"user_defined_collections/schemes/{schemeName}";
+            var response = GetPepperiApi(requestUri);
+
+            return PepperiJsonSerializer.DeserializeOne<UDC_MetaData>(response.Body);
+        }
+
+        public UDC_MetaData UpsertUserDefinedCollection(UDC_MetaData collection)
+        {
+            ValuesValidator.Validate(collection, "Collection is not empty!");
+
+            var requestUri = $"user_defined_collections/schemes";
+            var body = PepperiJsonSerializer.Serialize(collection);
+            var response = PostPepperiApi(requestUri, body);
+
+            var result = PepperiJsonSerializer.DeserializeOne<UDC_MetaData>(response.Body);
+            return result;
+        }
+
+        public bool DeleteUserDefinedCollection(string schemeName)
+        {
+            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
+
+            var isSchemeExist = GetUserDefinedCollection(schemeName)?.Name != null;
+            ValuesValidator.Validate(isSchemeExist, "Scheme is not exist!");
+            var requestUri = $"user_defined_collections/schemes";
+            var body = PepperiJsonSerializer.Serialize(new UDC_MetaData()
+            {
+                Name = schemeName,
+                Hidden = true
+            });
+            var response = PostPepperiApi(requestUri, body);
+
+            var result = PepperiJsonSerializer.DeserializeOne<UDC_MetaData>(response.Body);
+            return result?.Hidden == true;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private PepperiHttpClientResponse GetPepperiApi(string requestUrl, Dictionary<string, string> dicQueryStringParameters = null)
+        {
+            string accept = "application/json";
             PepperiHttpClient PepperiHttpClient = new PepperiHttpClient(this.Authentication, this.Logger);
             PepperiHttpClientResponse PepperiHttpClientResponse = PepperiHttpClient.Get(
                     ApiBaseUri,
-                    RequestUri,
-                    dicQueryStringParameters,
-                    accept);
+                    requestUrl,
+                    dicQueryStringParameters ?? new Dictionary<string, string>() { },
+                    accept
+                    );
 
             PepperiHttpClient.HandleError(PepperiHttpClientResponse);
 
-            IEnumerable<UserDefinedCollection_MetaData> result = PepperiJsonSerializer.DeserializeCollection<UserDefinedCollection_MetaData>(PepperiHttpClientResponse.Body);
-            return result;
+            return PepperiHttpClientResponse;
+        }
+
+        private PepperiHttpClientResponse PostPepperiApi(string requestUrl, string body)
+        {
+            string contentType = "application/json";
+            string accept = "application/json";
+
+            PepperiHttpClient PepperiHttpClient = new PepperiHttpClient(this.Authentication, this.Logger);
+            PepperiHttpClientResponse PepperiHttpClientResponse = PepperiHttpClient.PostStringContent(
+                    ApiBaseUri,
+                    requestUrl,
+                    new Dictionary<string, string>() { },
+                    body,
+                    contentType,
+                    accept
+                    );
+
+            PepperiHttpClient.HandleError(PepperiHttpClientResponse);
+
+            return PepperiHttpClientResponse;
         }
 
         #endregion
