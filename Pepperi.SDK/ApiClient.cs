@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Pepperi.SDK.Contracts;
+using Pepperi.SDK.Endpoints.Fixed;
 
 namespace Pepperi.SDK
 {
@@ -92,6 +93,8 @@ namespace Pepperi.SDK
 
             this.UserDefinedCollectionsMetaData = new UserDefinedCollectionsMetaData_Endpoint(AuthentificationManager?.IdpAuth, Logger);
             this.UserDefinedCollections = new UserDefinedCollectionsEndpoint(AuthentificationManager, Logger);
+
+            this.Surveys = new SurveysEndpoint(AuthentificationManager, Logger);
         }
 
         #endregion
@@ -171,6 +174,7 @@ namespace Pepperi.SDK
         public UserDefinedCollectionsMetaData_Endpoint UserDefinedCollectionsMetaData { get; private set; }
         public UserDefinedCollectionsEndpoint UserDefinedCollections { get; private set; }
 
+        public SurveysEndpoint Surveys { get; private set; }
 
         #endregion
 

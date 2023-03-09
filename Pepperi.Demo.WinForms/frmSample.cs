@@ -13,7 +13,9 @@ using Pepperi.SDK.Helpers;
 using Pepperi.SDK.Model;
 using Pepperi.SDK.Model.Fixed;
 using Pepperi.SDK.Model.Fixed.MetaData;
+using Pepperi.SDK.Model.Fixed.Resources;
 using WinFormApiDemo;
+using WinFormApiDemo.Surveys_Forms;
 using WinFormApiDemo.User_Defined_Collections_Forms;
 
 namespace WindowsFormsApp1
@@ -34,6 +36,8 @@ namespace WindowsFormsApp1
         private JArray response = null;
         private udcExportFileConfiguration udcExportFileConfiguration = new udcExportFileConfiguration();
         private udcSchemeSelectorForm udcSchemeSelectorForm;
+        private surveysResponseForm surveysResponseForm;
+        private surveysUpsertForm surveysUpsertForm;
         public frmSample()
         {
             InitializeComponent();
@@ -119,9 +123,9 @@ namespace WindowsFormsApp1
                 };
                 MessageBox.Show("Connected!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show("Not Connected!. reason: " + ex.ToString ());
+                MessageBox.Show("Not Connected!. reason: " + ex.ToString());
             }
         }
 
@@ -142,6 +146,9 @@ namespace WindowsFormsApp1
                 {
                     Client = client
                 };
+
+                surveysResponseForm = new surveysResponseForm();
+                surveysUpsertForm = new surveysUpsertForm();
             }
         }
 
@@ -150,7 +157,7 @@ namespace WindowsFormsApp1
         {
             JArray sorted;
             if (sortAscending)
-                 sorted = new JArray(response.OrderBy(obj => (string)obj[dataGridView1.Columns[e.ColumnIndex].DataPropertyName]));
+                sorted = new JArray(response.OrderBy(obj => (string)obj[dataGridView1.Columns[e.ColumnIndex].DataPropertyName]));
             else
                 sorted = new JArray(response.OrderByDescending(obj => (string)obj[dataGridView1.Columns[e.ColumnIndex].DataPropertyName]));
             sortAscending = !sortAscending;
@@ -165,7 +172,8 @@ namespace WindowsFormsApp1
 
             var overwrite = false;
             var overwriteObject = false;
-            using (var configForm = new udcUploadConfigurationForm()) {
+            using (var configForm = new udcUploadConfigurationForm())
+            {
                 if (configForm.ShowDialog() != DialogResult.OK)
                 {
                     return;
@@ -176,7 +184,7 @@ namespace WindowsFormsApp1
 
             openFileDialog1.ShowDialog();
             string file = openFileDialog1.FileName;
-            if(file!= "openFileDialog1" && schecma!="")
+            if (file != "openFileDialog1" && schecma != "")
             {
                 UDC_UploadFile_Result response = null;
 
@@ -195,7 +203,7 @@ namespace WindowsFormsApp1
                     MessageBox.Show("Error with importing scheme data!");
                     return;
                 }
-                
+
                 string message = "";
                 if (response.TotalFailed == 0)
                 {
@@ -225,7 +233,8 @@ namespace WindowsFormsApp1
         private void btnViewUdc_Click(object sender, EventArgs e)
         {
             schecma = ProccedUdcFormSelection();
-            if (schecma == null) {
+            if (schecma == null)
+            {
                 return;
             }
 
@@ -264,10 +273,11 @@ namespace WindowsFormsApp1
                         columns["Key"].DisplayIndex = 0;
                 }
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 dataGridView1.DataSource = response;
             }
-            
+
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -295,7 +305,8 @@ namespace WindowsFormsApp1
             dataGridView1.DataSource = collections;
         }
 
-        private string ProccedUdcFormSelection() {
+        private string ProccedUdcFormSelection()
+        {
             List<string> collections = new List<string>();
             PleaseWaitForm pleaseWait = new PleaseWaitForm();
             if (udcNames == null)
@@ -341,7 +352,8 @@ namespace WindowsFormsApp1
             var includeDeleted = udcExportFileConfiguration.IncludeDeleted;
 
             var fodlerSelectionResult = folderBrowserDialog1.ShowDialog();
-            if (fodlerSelectionResult != DialogResult.OK) {
+            if (fodlerSelectionResult != DialogResult.OK)
+            {
                 return;
             }
             var folderPath = folderBrowserDialog1.SelectedPath;
@@ -380,7 +392,8 @@ namespace WindowsFormsApp1
             {
                 client.UserDefinedCollectionsMetaData.DeleteUserDefinedCollection(schecma);
                 var existingSchemes = udcSchemeSelectorForm.GetComboBoxValues();
-                if (existingSchemes != null && existingSchemes.Count() > 0) {
+                if (existingSchemes != null && existingSchemes.Count() > 0)
+                {
                     var newSchemes = existingSchemes.Where(schemeName => schemeName != schecma).ToList();
                     udcSchemeSelectorForm.SetComboBoxValues(newSchemes);
                     udcNames = newSchemes;
@@ -396,7 +409,70 @@ namespace WindowsFormsApp1
             }
         }
 
-        
+        private void button1_Click_2(object sender, EventArgs e)
+        {
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+            try
+            {
+                var surveys = client.Surveys.Find();
+                pleaseWait.Close();
+
+                var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(
+                                    surveys,
+                                    Newtonsoft.Json.Formatting.Indented,
+                                    new Newtonsoft.Json.JsonSerializerSettings
+                                    {
+                                        NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
+                                        DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc //will serialize date time as utc
+                                    });
+
+                dataGridView1.DataSource = surveys;
+
+                surveysResponseForm.SetText(serialized);
+                surveysResponseForm.ShowDialog();
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+
+        }
+
+        private void surveysUpsert_Click(object sender, EventArgs e)
+        {
+            if (surveysUpsertForm.ShowDialog() != DialogResult.OK) return;
+            var surveyToUpsertJson = surveysUpsertForm.SurveyToUpsertJson;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+            try
+            {
+                var surveyToUpsertParsed = Newtonsoft.Json.JsonConvert.DeserializeObject<Survey>(surveyToUpsertJson);
+                var survey = client.Surveys.Upsert(surveyToUpsertParsed);
+                pleaseWait.Close();
+
+                var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(
+                                    survey,
+                                    Newtonsoft.Json.Formatting.Indented,
+                                    new Newtonsoft.Json.JsonSerializerSettings
+                                    {
+                                        NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
+                                        DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc //will serialize date time as utc
+                                    });
+
+                surveysResponseForm.SetText(serialized);
+                surveysResponseForm.ShowDialog();
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
     }
 
 

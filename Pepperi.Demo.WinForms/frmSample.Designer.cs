@@ -51,19 +51,23 @@
             this.DeleteSchemeButton = new System.Windows.Forms.Button();
             this.ExportDataFile = new System.Windows.Forms.Button();
             this.ViewSchemes = new System.Windows.Forms.Button();
+            this.Surveys = new System.Windows.Forms.TabPage();
+            this.getSurveys = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.surveysUpsert = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.Generic.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.Surveys.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnViewItems
             // 
-            this.btnViewItems.Location = new System.Drawing.Point(7, 6);
-            this.btnViewItems.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnViewItems.Location = new System.Drawing.Point(5, 5);
+            this.btnViewItems.Margin = new System.Windows.Forms.Padding(2);
             this.btnViewItems.Name = "btnViewItems";
-            this.btnViewItems.Size = new System.Drawing.Size(155, 64);
+            this.btnViewItems.Size = new System.Drawing.Size(116, 52);
             this.btnViewItems.TabIndex = 0;
             this.btnViewItems.Text = "View Items";
             this.btnViewItems.UseVisualStyleBackColor = true;
@@ -72,20 +76,20 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 185);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dataGridView1.Location = new System.Drawing.Point(9, 150);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1155, 389);
+            this.dataGridView1.Size = new System.Drawing.Size(866, 316);
             this.dataGridView1.TabIndex = 1;
             // 
             // btnViewAcounts
             // 
-            this.btnViewAcounts.Location = new System.Drawing.Point(167, 6);
-            this.btnViewAcounts.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnViewAcounts.Location = new System.Drawing.Point(125, 5);
+            this.btnViewAcounts.Margin = new System.Windows.Forms.Padding(2);
             this.btnViewAcounts.Name = "btnViewAcounts";
-            this.btnViewAcounts.Size = new System.Drawing.Size(205, 64);
+            this.btnViewAcounts.Size = new System.Drawing.Size(154, 52);
             this.btnViewAcounts.TabIndex = 2;
             this.btnViewAcounts.Text = "View Accounts (Customers)";
             this.btnViewAcounts.UseVisualStyleBackColor = true;
@@ -93,10 +97,10 @@
             // 
             // btnSaveAll
             // 
-            this.btnSaveAll.Location = new System.Drawing.Point(537, 6);
-            this.btnSaveAll.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSaveAll.Location = new System.Drawing.Point(403, 5);
+            this.btnSaveAll.Margin = new System.Windows.Forms.Padding(2);
             this.btnSaveAll.Name = "btnSaveAll";
-            this.btnSaveAll.Size = new System.Drawing.Size(155, 64);
+            this.btnSaveAll.Size = new System.Drawing.Size(116, 52);
             this.btnSaveAll.TabIndex = 3;
             this.btnSaveAll.Text = "Save All";
             this.btnSaveAll.UseVisualStyleBackColor = true;
@@ -104,10 +108,10 @@
             // 
             // btnSaveSelected
             // 
-            this.btnSaveSelected.Location = new System.Drawing.Point(377, 6);
-            this.btnSaveSelected.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSaveSelected.Location = new System.Drawing.Point(283, 5);
+            this.btnSaveSelected.Margin = new System.Windows.Forms.Padding(2);
             this.btnSaveSelected.Name = "btnSaveSelected";
-            this.btnSaveSelected.Size = new System.Drawing.Size(155, 64);
+            this.btnSaveSelected.Size = new System.Drawing.Size(116, 52);
             this.btnSaveSelected.TabIndex = 4;
             this.btnSaveSelected.Text = "Save Selected";
             this.btnSaveSelected.UseVisualStyleBackColor = true;
@@ -115,10 +119,10 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(12, 12);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnConnect.Location = new System.Drawing.Point(9, 10);
+            this.btnConnect.Margin = new System.Windows.Forms.Padding(2);
             this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(219, 46);
+            this.btnConnect.Size = new System.Drawing.Size(164, 37);
             this.btnConnect.TabIndex = 5;
             this.btnConnect.Text = "Connect And Use This Token";
             this.btnConnect.UseVisualStyleBackColor = true;
@@ -126,80 +130,84 @@
             // 
             // txtEmail
             // 
-            this.txtEmail.Location = new System.Drawing.Point(333, 12);
-            this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtEmail.Location = new System.Drawing.Point(250, 10);
+            this.txtEmail.Margin = new System.Windows.Forms.Padding(2);
             this.txtEmail.Name = "txtEmail";
-            this.txtEmail.Size = new System.Drawing.Size(263, 22);
+            this.txtEmail.Size = new System.Drawing.Size(198, 20);
             this.txtEmail.TabIndex = 6;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(256, 12);
+            this.label1.Location = new System.Drawing.Point(192, 10);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(42, 17);
+            this.label1.Size = new System.Drawing.Size(32, 13);
             this.label1.TabIndex = 7;
             this.label1.Text = "Email";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(256, 39);
+            this.label2.Location = new System.Drawing.Point(192, 32);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(69, 17);
+            this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 9;
             this.label2.Text = "Password";
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(333, 39);
-            this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtPassword.Location = new System.Drawing.Point(250, 32);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(2);
             this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(263, 22);
+            this.txtPassword.Size = new System.Drawing.Size(198, 20);
             this.txtPassword.TabIndex = 8;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(675, 12);
+            this.label3.Location = new System.Drawing.Point(506, 10);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(111, 17);
+            this.label3.Size = new System.Drawing.Size(85, 13);
             this.label3.TabIndex = 11;
             this.label3.Text = "Company Token";
             // 
             // txtToken
             // 
-            this.txtToken.Location = new System.Drawing.Point(809, 12);
-            this.txtToken.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtToken.Location = new System.Drawing.Point(607, 10);
+            this.txtToken.Margin = new System.Windows.Forms.Padding(2);
             this.txtToken.Name = "txtToken";
-            this.txtToken.Size = new System.Drawing.Size(357, 22);
+            this.txtToken.Size = new System.Drawing.Size(269, 20);
             this.txtToken.TabIndex = 10;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(675, 39);
+            this.label4.Location = new System.Drawing.Point(506, 32);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(82, 17);
+            this.label4.Size = new System.Drawing.Size(60, 13);
             this.label4.TabIndex = 13;
             this.label4.Text = "Filter Query";
             // 
             // txtFilter
             // 
-            this.txtFilter.Location = new System.Drawing.Point(809, 39);
-            this.txtFilter.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtFilter.Location = new System.Drawing.Point(607, 32);
+            this.txtFilter.Margin = new System.Windows.Forms.Padding(2);
             this.txtFilter.Multiline = true;
             this.txtFilter.Name = "txtFilter";
-            this.txtFilter.Size = new System.Drawing.Size(357, 22);
+            this.txtFilter.Size = new System.Drawing.Size(269, 19);
             this.txtFilter.TabIndex = 12;
             this.txtFilter.Text = "Name Like \'%A%\'";
             // 
             // btnUploadUdc
             // 
-            this.btnUploadUdc.Location = new System.Drawing.Point(101, 7);
-            this.btnUploadUdc.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnUploadUdc.Location = new System.Drawing.Point(76, 6);
+            this.btnUploadUdc.Margin = new System.Windows.Forms.Padding(2);
             this.btnUploadUdc.Name = "btnUploadUdc";
-            this.btnUploadUdc.Size = new System.Drawing.Size(121, 63);
+            this.btnUploadUdc.Size = new System.Drawing.Size(91, 51);
             this.btnUploadUdc.TabIndex = 15;
             this.btnUploadUdc.Text = "Upload Data";
             this.btnUploadUdc.UseVisualStyleBackColor = true;
@@ -211,10 +219,10 @@
             // 
             // btnViewUdc
             // 
-            this.btnViewUdc.Location = new System.Drawing.Point(7, 6);
-            this.btnViewUdc.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnViewUdc.Location = new System.Drawing.Point(5, 5);
+            this.btnViewUdc.Margin = new System.Windows.Forms.Padding(2);
             this.btnViewUdc.Name = "btnViewUdc";
-            this.btnViewUdc.Size = new System.Drawing.Size(89, 64);
+            this.btnViewUdc.Size = new System.Drawing.Size(67, 52);
             this.btnViewUdc.TabIndex = 16;
             this.btnViewUdc.Text = "View Data";
             this.btnViewUdc.UseVisualStyleBackColor = true;
@@ -224,11 +232,11 @@
             // 
             this.tabControl1.Controls.Add(this.Generic);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(16, 69);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControl1.Controls.Add(this.Surveys);
+            this.tabControl1.Location = new System.Drawing.Point(12, 56);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1149, 110);
+            this.tabControl1.Size = new System.Drawing.Size(862, 89);
             this.tabControl1.TabIndex = 18;
             // 
             // Generic
@@ -238,11 +246,10 @@
             this.Generic.Controls.Add(this.btnViewAcounts);
             this.Generic.Controls.Add(this.btnSaveSelected);
             this.Generic.Controls.Add(this.btnSaveAll);
-            this.Generic.Location = new System.Drawing.Point(4, 25);
-            this.Generic.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Generic.Location = new System.Drawing.Point(4, 22);
             this.Generic.Name = "Generic";
-            this.Generic.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.Generic.Size = new System.Drawing.Size(1141, 81);
+            this.Generic.Padding = new System.Windows.Forms.Padding(3);
+            this.Generic.Size = new System.Drawing.Size(854, 63);
             this.Generic.TabIndex = 0;
             this.Generic.Text = "Generic";
             // 
@@ -254,20 +261,18 @@
             this.tabPage2.Controls.Add(this.ViewSchemes);
             this.tabPage2.Controls.Add(this.btnUploadUdc);
             this.tabPage2.Controls.Add(this.btnViewUdc);
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage2.Size = new System.Drawing.Size(1141, 81);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(854, 63);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "User Defined Collections";
             // 
             // DeleteSchemeButton
             // 
-            this.DeleteSchemeButton.Location = new System.Drawing.Point(1009, 6);
-            this.DeleteSchemeButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DeleteSchemeButton.Location = new System.Drawing.Point(757, 5);
             this.DeleteSchemeButton.Name = "DeleteSchemeButton";
-            this.DeleteSchemeButton.Size = new System.Drawing.Size(119, 63);
+            this.DeleteSchemeButton.Size = new System.Drawing.Size(89, 51);
             this.DeleteSchemeButton.TabIndex = 19;
             this.DeleteSchemeButton.Text = "Delete Scheme";
             this.DeleteSchemeButton.UseVisualStyleBackColor = true;
@@ -275,10 +280,9 @@
             // 
             // ExportDataFile
             // 
-            this.ExportDataFile.Location = new System.Drawing.Point(229, 7);
-            this.ExportDataFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ExportDataFile.Location = new System.Drawing.Point(172, 6);
             this.ExportDataFile.Name = "ExportDataFile";
-            this.ExportDataFile.Size = new System.Drawing.Size(136, 63);
+            this.ExportDataFile.Size = new System.Drawing.Size(102, 51);
             this.ExportDataFile.TabIndex = 18;
             this.ExportDataFile.Text = "Export Data (File)";
             this.ExportDataFile.UseVisualStyleBackColor = true;
@@ -286,20 +290,53 @@
             // 
             // ViewSchemes
             // 
-            this.ViewSchemes.Location = new System.Drawing.Point(883, 6);
-            this.ViewSchemes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ViewSchemes.Location = new System.Drawing.Point(662, 5);
             this.ViewSchemes.Name = "ViewSchemes";
-            this.ViewSchemes.Size = new System.Drawing.Size(119, 63);
+            this.ViewSchemes.Size = new System.Drawing.Size(89, 51);
             this.ViewSchemes.TabIndex = 17;
             this.ViewSchemes.Text = "View Schemes";
             this.ViewSchemes.UseVisualStyleBackColor = true;
             this.ViewSchemes.Click += new System.EventHandler(this.button1_Click_1);
             // 
+            // Surveys
+            // 
+            this.Surveys.BackColor = System.Drawing.SystemColors.Control;
+            this.Surveys.Controls.Add(this.surveysUpsert);
+            this.Surveys.Controls.Add(this.getSurveys);
+            this.Surveys.Location = new System.Drawing.Point(4, 22);
+            this.Surveys.Name = "Surveys";
+            this.Surveys.Padding = new System.Windows.Forms.Padding(3);
+            this.Surveys.Size = new System.Drawing.Size(854, 63);
+            this.Surveys.TabIndex = 2;
+            this.Surveys.Text = "Surveys";
+            // 
+            // getSurveys
+            // 
+            this.getSurveys.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.getSurveys.Location = new System.Drawing.Point(6, 6);
+            this.getSurveys.Name = "getSurveys";
+            this.getSurveys.Size = new System.Drawing.Size(88, 51);
+            this.getSurveys.TabIndex = 0;
+            this.getSurveys.Text = "View";
+            this.getSurveys.UseVisualStyleBackColor = true;
+            this.getSurveys.Click += new System.EventHandler(this.button1_Click_2);
+            // 
+            // surveysUpsert
+            // 
+            this.surveysUpsert.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.surveysUpsert.Location = new System.Drawing.Point(100, 6);
+            this.surveysUpsert.Name = "surveysUpsert";
+            this.surveysUpsert.Size = new System.Drawing.Size(88, 51);
+            this.surveysUpsert.TabIndex = 1;
+            this.surveysUpsert.Text = "Upsert";
+            this.surveysUpsert.UseVisualStyleBackColor = true;
+            this.surveysUpsert.Click += new System.EventHandler(this.surveysUpsert_Click);
+            // 
             // frmSample
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1181, 587);
+            this.ClientSize = new System.Drawing.Size(886, 477);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtFilter);
@@ -311,7 +348,7 @@
             this.Controls.Add(this.txtEmail);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.dataGridView1);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "frmSample";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Pepperi API Demo";
@@ -320,6 +357,7 @@
             this.tabControl1.ResumeLayout(false);
             this.Generic.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.Surveys.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -351,6 +389,9 @@
         private System.Windows.Forms.Button ExportDataFile;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Button DeleteSchemeButton;
+        private System.Windows.Forms.TabPage Surveys;
+        private System.Windows.Forms.Button getSurveys;
+        private System.Windows.Forms.Button surveysUpsert;
     }
 }
 

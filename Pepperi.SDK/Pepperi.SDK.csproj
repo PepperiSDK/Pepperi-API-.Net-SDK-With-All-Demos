@@ -72,6 +72,7 @@
     <Compile Include="Endpoints\CatalogsMetaData_Endpoint.cs" />
     <Compile Include="Endpoints\ContactsEndpoint.cs" />
     <Compile Include="Endpoints\ContactsMetaData_Endpoint.cs" />
+    <Compile Include="Endpoints\Fixed\SurveysEndpoint.cs" />
     <Compile Include="Endpoints\InventoryEndpoint.cs" />
     <Compile Include="Endpoints\InventoryMetaData_Endpoint.cs" />
     <Compile Include="Endpoints\ItemDimensions1_MetaData_Endpoint.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="Model\Fixed\PepperiAuditLog.cs" />
     <Compile Include="Model\Fixed\Reference.cs" />
     <Compile Include="Model\Fixed\References.cs" />
+    <Compile Include="Model\Fixed\Resources\Survey.cs" />
     <Compile Include="Model\Fixed\TypeMetadata.cs" />
     <Compile Include="Model\Fixed\UserDefinedField.cs" />
     <Compile Include="Model\Fixed\UserDefinedTable.cs" />

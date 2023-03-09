@@ -61,6 +61,18 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Surveys Forms\surveysResponseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Surveys Forms\surveysResponseForm.Designer.cs">
+      <DependentUpon>surveysResponseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Surveys Forms\surveysUpsertForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Surveys Forms\surveysUpsertForm.Designer.cs">
+      <DependentUpon>surveysUpsertForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="User Defined Collections Forms\udcExportFileConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +107,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Surveys Forms\surveysResponseForm.resx">
+      <DependentUpon>surveysResponseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Surveys Forms\surveysUpsertForm.resx">
+      <DependentUpon>surveysUpsertForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="User Defined Collections Forms\udcExportFileConfiguration.resx">
       <DependentUpon>udcExportFileConfiguration.cs</DependentUpon>
     </EmbeddedResource>
@@ -127,5 +145,6 @@
       <Version>13.0.2</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
