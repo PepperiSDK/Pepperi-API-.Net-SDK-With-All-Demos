@@ -21,8 +21,8 @@ namespace Pepperi.SDK.Endpoints
 
         #region Constructor
 
-        internal UserDefinedCollectionsEndpoint(AuthentificationManager AuthentificationManager, ILogger Logger) :
-            base(AuthentificationManager, Logger)
+        internal UserDefinedCollectionsEndpoint(AuthentificationManager AuthentificationManager, ILogger Logger, string papiBaseUri = null, string ipaasBaseUrl = null) :
+            base(AuthentificationManager, Logger, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl)
         {
         }
 

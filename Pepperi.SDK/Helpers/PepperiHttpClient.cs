@@ -95,10 +95,14 @@ namespace Pepperi.SDK.Helpers
             string BaseUri,
             string RequestUri,
             Dictionary<string, string> dicQueryStringParameters,        //where, order by, any other parameters (page, page_size etc)
-            string accept
+            string accept,
+            bool isMinifiedLog = false
         )
         {
-            var HttpClient = new HttpClient(new LoggingHandler(this.Logger))
+            var HttpClient = isMinifiedLog ? new HttpClient()
+            {
+                BaseAddress = new Uri(BaseUri)
+            } : new HttpClient(new LoggingHandler(this.Logger))
             {
                 BaseAddress = new Uri(BaseUri)
             };
@@ -203,10 +207,14 @@ namespace Pepperi.SDK.Helpers
             Dictionary<string, string> dicQueryStringParameters,//where, order by, any other parameters (page, page_size etc)
             string postBody,
             string contentType,     //eg, application/json
-            string accept
+            string accept,
+            bool isMinifiedLog = false
         )
         {
-            var HttpClient = new HttpClient(new LoggingHandler(this.Logger))
+            var HttpClient = isMinifiedLog ? new HttpClient()
+            {
+                BaseAddress = new Uri(BaseUri)
+            } : new HttpClient(new LoggingHandler(this.Logger))
             {
                 BaseAddress = new Uri(BaseUri)
             };

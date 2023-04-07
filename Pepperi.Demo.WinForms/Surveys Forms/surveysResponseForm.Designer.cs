@@ -30,17 +30,18 @@
         {
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.closeButton = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(12, 12);
+            this.textBox1.Location = new System.Drawing.Point(12, 49);
             this.textBox1.MaxLength = 200000;
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(605, 397);
+            this.textBox1.Size = new System.Drawing.Size(605, 360);
             this.textBox1.TabIndex = 0;
             // 
             // closeButton
@@ -54,11 +55,25 @@
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
             // 
+            // textBox2
+            // 
+            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox2.Location = new System.Drawing.Point(12, 12);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.ReadOnly = true;
+            this.textBox2.Size = new System.Drawing.Size(605, 31);
+            this.textBox2.TabIndex = 3;
+            this.textBox2.Text = "Please Note: Text Box shows response after deserialization / serialization, so it" +
+    " is not original response from Pepperi (some data can be not showed because of M" +
+    "odel)";
+            // 
             // surveysResponseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(629, 465);
+            this.Controls.Add(this.textBox2);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.textBox1);
             this.Name = "surveysResponseForm";
@@ -73,5 +88,6 @@
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }

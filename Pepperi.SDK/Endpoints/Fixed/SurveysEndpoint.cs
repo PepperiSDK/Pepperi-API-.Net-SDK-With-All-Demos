@@ -12,7 +12,8 @@ namespace Pepperi.SDK.Endpoints.Fixed
 {
     public class SurveysEndpoint
     {
-        private string ResourceName { get; set; } = "MySurveys";
+        private string SurveysResourseName { get; set; } = "MySurveys";
+        private string SurveysTemplatesResourseName { get; set; } = "MySurveyTemplates";
 
         private string ApiBaseUri { get; set; }
         private string IpaasBaseUri { get; set; }
@@ -21,10 +22,10 @@ namespace Pepperi.SDK.Endpoints.Fixed
 
         #region constructor
 
-        internal SurveysEndpoint(AuthentificationManager AuthentificationManager, ILogger Logger)
+        internal SurveysEndpoint(AuthentificationManager AuthentificationManager, ILogger Logger, string papiBaseUri = null, string ipaasBaseUrl = null)
         {
-            this.ApiBaseUri = "https://papi.pepperi.com/v1.0/";
-            this.IpaasBaseUri = "https://integration.pepperi.com/prod/api/";
+            this.ApiBaseUri = papiBaseUri;
+            this.IpaasBaseUri = ipaasBaseUrl;
             this.AuthentificationManager = AuthentificationManager;
             this.Logger = Logger;
         }
@@ -35,21 +36,56 @@ namespace Pepperi.SDK.Endpoints.Fixed
 
         #region Read / Get
 
-        public IEnumerable<Survey> Find()
+        public IEnumerable<Survey> Find(string where = null, string fields = null)
+        {
+            return Find<Survey>(where, fields);
+        }
+
+        public IEnumerable<TObject> Find<TObject>(string where = null, string fields = null)
         {
 
-            var response = GetSurveyApi();
-            var result = PepperiJsonSerializer.DeserializeCollection<Survey>(response.Body);
+            Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
+            if (where != null) { dicQueryStringParameters.Add("where", where); }
+            if (fields != null) { dicQueryStringParameters.Add("fields", fields); }
+
+            var response = GetSurveyApi(dicQueryStringParameters);
+            var result = PepperiJsonSerializer.DeserializeCollection<TObject>(response.Body);
             return result;
         }
 
         public Survey Upsert(Survey survey)
         {
+            return Upsert<Survey>(survey);
+        }
+
+        public TObject Upsert<TObject>(TObject survey)
+        {
             string postBody = PepperiJsonSerializer.Serialize(survey);
 
             var response = PostSurveyApi(postBody);
 
-            var result = PepperiJsonSerializer.DeserializeOne<Survey>(response.Body);
+            var result = PepperiJsonSerializer.DeserializeOne<TObject>(response.Body);
+            return result;
+        }
+
+        #endregion
+
+        #region Survey Templates
+
+        public IEnumerable<SurveyTemplate> FindTemplates(string where = null, string fields = null)
+        {
+            return FindTemplates<SurveyTemplate>(where, fields);
+        }
+
+        public IEnumerable<TObject> FindTemplates<TObject>(string where = null, string fields = null)
+        {
+
+            Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
+            if (where != null) { dicQueryStringParameters.Add("where", where); }
+            if (fields != null) { dicQueryStringParameters.Add("fields", fields); }
+
+            var response = GetSurveyTemplatesApi(dicQueryStringParameters);
+            var result = PepperiJsonSerializer.DeserializeCollection<TObject>(response.Body);
             return result;
         }
 
@@ -63,11 +99,26 @@ namespace Pepperi.SDK.Endpoints.Fixed
 
         private PepperiHttpClientResponse GetSurveyApi(Dictionary<string, string> dicQueryStringParameters = null)
         {
+            return GetResourseApi(this.SurveysResourseName, dicQueryStringParameters);
+        }
+
+        private PepperiHttpClientResponse PostSurveyApi(string body)
+        {
+            return PostResourseApi(this.SurveysResourseName, body);
+        }
+
+        private PepperiHttpClientResponse GetSurveyTemplatesApi(Dictionary<string, string> dicQueryStringParameters = null)
+        {
+            return GetResourseApi(this.SurveysTemplatesResourseName, dicQueryStringParameters);
+        }
+
+        private PepperiHttpClientResponse GetResourseApi(string requestUri, Dictionary<string, string> dicQueryStringParameters = null)
+        {
             string accept = "application/json";
             PepperiHttpClient PepperiHttpClient = new PepperiHttpClient(this.AuthentificationManager.IdpAuth, this.Logger);
             PepperiHttpClientResponse PepperiHttpClientResponse = PepperiHttpClient.Get(
                     this.GetResourceBaseUrl(),
-                    "",
+                    requestUri,
                     dicQueryStringParameters ?? new Dictionary<string, string>() { },
                     accept
                     );
@@ -77,7 +128,7 @@ namespace Pepperi.SDK.Endpoints.Fixed
             return PepperiHttpClientResponse;
         }
 
-        private PepperiHttpClientResponse PostSurveyApi(string body)
+        private PepperiHttpClientResponse PostResourseApi(string requestUri, string body)
         {
             string contentType = "application/json";
             string accept = "application/json";
@@ -85,7 +136,7 @@ namespace Pepperi.SDK.Endpoints.Fixed
             PepperiHttpClient PepperiHttpClient = new PepperiHttpClient(this.AuthentificationManager.IdpAuth, this.Logger);
             PepperiHttpClientResponse PepperiHttpClientResponse = PepperiHttpClient.PostStringContent(
                     this.GetResourceBaseUrl(),
-                    "",
+                    requestUri,
                     new Dictionary<string, string>() { },
                     body,
                     contentType,
@@ -99,7 +150,7 @@ namespace Pepperi.SDK.Endpoints.Fixed
 
         private string GetResourceBaseUrl()
         {
-            return this.ApiBaseUri + "resources/" + this.ResourceName;
+            return this.ApiBaseUri + "resources/";
         }
 
         #endregion

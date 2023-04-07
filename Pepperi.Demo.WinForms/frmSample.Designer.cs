@@ -45,21 +45,25 @@
             this.btnUploadUdc = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.btnViewUdc = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.ipaasJobsTab = new System.Windows.Forms.TabControl();
             this.Generic = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.DeleteSchemeButton = new System.Windows.Forms.Button();
             this.ExportDataFile = new System.Windows.Forms.Button();
             this.ViewSchemes = new System.Windows.Forms.Button();
             this.Surveys = new System.Windows.Forms.TabPage();
+            this.btnViewTemplates = new System.Windows.Forms.Button();
+            this.surveysUpsert = new System.Windows.Forms.Button();
             this.getSurveys = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.surveysUpsert = new System.Windows.Forms.Button();
+            this.ipaasJobsTabPage = new System.Windows.Forms.TabPage();
+            this.ipaasRunJobButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.tabControl1.SuspendLayout();
+            this.ipaasJobsTab.SuspendLayout();
             this.Generic.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.Surveys.SuspendLayout();
+            this.ipaasJobsTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnViewItems
@@ -228,16 +232,17 @@
             this.btnViewUdc.UseVisualStyleBackColor = true;
             this.btnViewUdc.Click += new System.EventHandler(this.btnViewUdc_Click);
             // 
-            // tabControl1
+            // ipaasJobsTab
             // 
-            this.tabControl1.Controls.Add(this.Generic);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.Surveys);
-            this.tabControl1.Location = new System.Drawing.Point(12, 56);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(862, 89);
-            this.tabControl1.TabIndex = 18;
+            this.ipaasJobsTab.Controls.Add(this.Generic);
+            this.ipaasJobsTab.Controls.Add(this.tabPage2);
+            this.ipaasJobsTab.Controls.Add(this.Surveys);
+            this.ipaasJobsTab.Controls.Add(this.ipaasJobsTabPage);
+            this.ipaasJobsTab.Location = new System.Drawing.Point(12, 56);
+            this.ipaasJobsTab.Name = "ipaasJobsTab";
+            this.ipaasJobsTab.SelectedIndex = 0;
+            this.ipaasJobsTab.Size = new System.Drawing.Size(862, 89);
+            this.ipaasJobsTab.TabIndex = 18;
             // 
             // Generic
             // 
@@ -301,6 +306,7 @@
             // Surveys
             // 
             this.Surveys.BackColor = System.Drawing.SystemColors.Control;
+            this.Surveys.Controls.Add(this.btnViewTemplates);
             this.Surveys.Controls.Add(this.surveysUpsert);
             this.Surveys.Controls.Add(this.getSurveys);
             this.Surveys.Location = new System.Drawing.Point(4, 22);
@@ -310,16 +316,16 @@
             this.Surveys.TabIndex = 2;
             this.Surveys.Text = "Surveys";
             // 
-            // getSurveys
+            // btnViewTemplates
             // 
-            this.getSurveys.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.getSurveys.Location = new System.Drawing.Point(6, 6);
-            this.getSurveys.Name = "getSurveys";
-            this.getSurveys.Size = new System.Drawing.Size(88, 51);
-            this.getSurveys.TabIndex = 0;
-            this.getSurveys.Text = "View";
-            this.getSurveys.UseVisualStyleBackColor = true;
-            this.getSurveys.Click += new System.EventHandler(this.button1_Click_2);
+            this.btnViewTemplates.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.btnViewTemplates.Location = new System.Drawing.Point(760, 6);
+            this.btnViewTemplates.Name = "btnViewTemplates";
+            this.btnViewTemplates.Size = new System.Drawing.Size(88, 51);
+            this.btnViewTemplates.TabIndex = 2;
+            this.btnViewTemplates.Text = "View Templates";
+            this.btnViewTemplates.UseVisualStyleBackColor = true;
+            this.btnViewTemplates.Click += new System.EventHandler(this.btnViewTemplates_Click);
             // 
             // surveysUpsert
             // 
@@ -332,12 +338,45 @@
             this.surveysUpsert.UseVisualStyleBackColor = true;
             this.surveysUpsert.Click += new System.EventHandler(this.surveysUpsert_Click);
             // 
+            // getSurveys
+            // 
+            this.getSurveys.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.getSurveys.Location = new System.Drawing.Point(6, 6);
+            this.getSurveys.Name = "getSurveys";
+            this.getSurveys.Size = new System.Drawing.Size(88, 51);
+            this.getSurveys.TabIndex = 0;
+            this.getSurveys.Text = "View";
+            this.getSurveys.UseVisualStyleBackColor = true;
+            this.getSurveys.Click += new System.EventHandler(this.getSurveys_Click);
+            // 
+            // ipaasJobsTabPage
+            // 
+            this.ipaasJobsTabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.ipaasJobsTabPage.Controls.Add(this.ipaasRunJobButton);
+            this.ipaasJobsTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ipaasJobsTabPage.Name = "ipaasJobsTabPage";
+            this.ipaasJobsTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.ipaasJobsTabPage.Size = new System.Drawing.Size(854, 63);
+            this.ipaasJobsTabPage.TabIndex = 3;
+            this.ipaasJobsTabPage.Text = "iPaaS Jobs";
+            // 
+            // ipaasRunJobButton
+            // 
+            this.ipaasRunJobButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.ipaasRunJobButton.Location = new System.Drawing.Point(6, 6);
+            this.ipaasRunJobButton.Name = "ipaasRunJobButton";
+            this.ipaasRunJobButton.Size = new System.Drawing.Size(88, 51);
+            this.ipaasRunJobButton.TabIndex = 1;
+            this.ipaasRunJobButton.Text = "Run Job";
+            this.ipaasRunJobButton.UseVisualStyleBackColor = true;
+            this.ipaasRunJobButton.Click += new System.EventHandler(this.ipaasRunJobButton_Click);
+            // 
             // frmSample
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(886, 477);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.ipaasJobsTab);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtFilter);
             this.Controls.Add(this.label3);
@@ -354,10 +393,11 @@
             this.Text = "Pepperi API Demo";
             this.Load += new System.EventHandler(this.frmSample_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.tabControl1.ResumeLayout(false);
+            this.ipaasJobsTab.ResumeLayout(false);
             this.Generic.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.Surveys.ResumeLayout(false);
+            this.ipaasJobsTabPage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -382,7 +422,7 @@
         private System.Windows.Forms.Button btnUploadUdc;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button btnViewUdc;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl ipaasJobsTab;
         private System.Windows.Forms.TabPage Generic;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button ViewSchemes;
@@ -392,6 +432,9 @@
         private System.Windows.Forms.TabPage Surveys;
         private System.Windows.Forms.Button getSurveys;
         private System.Windows.Forms.Button surveysUpsert;
+        private System.Windows.Forms.Button btnViewTemplates;
+        private System.Windows.Forms.TabPage ipaasJobsTabPage;
+        private System.Windows.Forms.Button ipaasRunJobButton;
     }
 }
 

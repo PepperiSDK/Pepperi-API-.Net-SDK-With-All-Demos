@@ -53,11 +53,30 @@
     <Compile Include="frmSample.Designer.cs">
       <DependentUpon>frmSample.cs</DependentUpon>
     </Compile>
-    <Compile Include="PleaseWaitForm.cs">
+    <Compile Include="General Forms\GetRequestDataForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PleaseWaitForm.Designer.cs">
+    <Compile Include="General Forms\GetRequestDataForm.designer.cs">
+      <DependentUpon>GetRequestDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="General Forms\PleaseWaitForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\PleaseWaitForm.designer.cs">
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\JsonParser.cs" />
+    <Compile Include="Ipaas Forms\GetIpaasScheduledJobIdForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ipaas Forms\GetIpaasScheduledJobIdForm.Designer.cs">
+      <DependentUpon>GetIpaasScheduledJobIdForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ipaas Forms\IpaasRunJobResultForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ipaas Forms\IpaasRunJobResultForm.Designer.cs">
+      <DependentUpon>IpaasRunJobResultForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,8 +113,17 @@
     <EmbeddedResource Include="frmSample.resx">
       <DependentUpon>frmSample.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PleaseWaitForm.resx">
+    <EmbeddedResource Include="General Forms\GetRequestDataForm.resx">
+      <DependentUpon>GetRequestDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\PleaseWaitForm.resx">
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ipaas Forms\GetIpaasScheduledJobIdForm.resx">
+      <DependentUpon>GetIpaasScheduledJobIdForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ipaas Forms\IpaasRunJobResultForm.resx">
+      <DependentUpon>IpaasRunJobResultForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

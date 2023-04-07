@@ -29,9 +29,9 @@ namespace Pepperi.SDK.Endpoints.Base
 
         #region constructor
 
-        protected Metadata_BaseEndpoint_For_UserDefinedCollections(IAuthentication Authentication, ILogger Logger)
+        protected Metadata_BaseEndpoint_For_UserDefinedCollections(IAuthentication Authentication, ILogger Logger, string papiBaseUri = null)
         {
-            this.ApiBaseUri = "https://papi.pepperi.com/v1.0/"; //Hardcoded Part
+            this.ApiBaseUri = papiBaseUri;
             this.Authentication = Authentication;
             this.Logger = Logger;
         }

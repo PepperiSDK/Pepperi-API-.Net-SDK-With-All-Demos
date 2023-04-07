@@ -18,13 +18,16 @@ namespace Pepperi.SDK
 
         #region Constructor
 
-        public ApiClient(string ApiBaseUri, IAuthentication Authentication, ILogger Logger, AuthentificationManager AuthentificationManager = null)
+        public ApiClient(string ApiBaseUri, IAuthentication Authentication, ILogger Logger, AuthentificationManager AuthentificationManager = null,
+            string papiBaseUri = "https://papi.pepperi.com/v1.0/",
+            string ipaasBaseUrl = "https://integration.pepperi.com/prod/api/")
         {
-            Initialize(ApiBaseUri, Authentication, Logger, AuthentificationManager);
+            Initialize(ApiBaseUri, Authentication, Logger, AuthentificationManager, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl);
         }
 
 
-        private void Initialize(string ApiBaseUri, IAuthentication Authentication, ILogger Logger, AuthentificationManager AuthentificationManager = null)
+        private void Initialize(string ApiBaseUri, IAuthentication Authentication, ILogger Logger, AuthentificationManager AuthentificationManager = null,
+            string papiBaseUri = null, string ipaasBaseUrl = null)
         {
             this.Accounts = new AccountsEndpoint(ApiBaseUri, Authentication, Logger);
             this.AccountsMetaData = new AccountsMetaData_Endpoint(ApiBaseUri, Authentication, Logger);
@@ -91,10 +94,12 @@ namespace Pepperi.SDK
             this.UserDefinedTables = new UserDefinedTablesEndpoint(ApiBaseUri, Authentication, Logger);
             this.UserDefinedTablesMetaData = new UserDefinedTableMetaData_Endpoint(ApiBaseUri, Authentication, Logger);
 
-            this.UserDefinedCollectionsMetaData = new UserDefinedCollectionsMetaData_Endpoint(AuthentificationManager?.IdpAuth, Logger);
-            this.UserDefinedCollections = new UserDefinedCollectionsEndpoint(AuthentificationManager, Logger);
+            this.UserDefinedCollectionsMetaData = new UserDefinedCollectionsMetaData_Endpoint(AuthentificationManager?.IdpAuth, Logger, papiBaseUri: papiBaseUri);
+            this.UserDefinedCollections = new UserDefinedCollectionsEndpoint(AuthentificationManager, Logger, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl);
 
-            this.Surveys = new SurveysEndpoint(AuthentificationManager, Logger);
+            this.Surveys = new SurveysEndpoint(AuthentificationManager, Logger, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl);
+
+            this.Ipaas = new IpaasApiClient(ipaasBaseUrl: ipaasBaseUrl, Logger: Logger, AuthentificationManager: AuthentificationManager);
         }
 
         #endregion
@@ -176,6 +181,7 @@ namespace Pepperi.SDK
 
         public SurveysEndpoint Surveys { get; private set; }
 
+        public IpaasApiClient Ipaas { get; private set; }
         #endregion
 
         #region Private methods

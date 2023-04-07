@@ -22,3 +22,17 @@ C:\Users\YossiRotlevy\Documents\GitHub\Pepperi-API-.Net-SDK-With-All-Demos\Peppe
 C:\Users\YossiRotlevy\Documents\GitHub\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WinFormSample.csproj.GenerateResource.Cache
 C:\Users\YossiRotlevy\Documents\GitHub\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WindowsFormsApp1.exe
 C:\Users\YossiRotlevy\Documents\GitHub\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WindowsFormsApp1.pdb
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\bin\Debug\WindowsFormsApp1.exe.config
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\bin\Debug\WindowsFormsApp1.exe
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\bin\Debug\WindowsFormsApp1.pdb
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\bin\Debug\Pepperi.SDK.dll
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\bin\Debug\Newtonsoft.Json.dll
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\bin\Debug\Pepperi.SDK.pdb
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WinFormSample.csprojAssemblyReference.cache
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WindowsFormsApp1.frmSample.resources
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WindowsFormsApp1.Properties.Resources.resources
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WinFormSample.csproj.GenerateResource.cache
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WinFormSample.csproj.CoreCompileInputs.cache
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WinFormSample.csproj.CopyComplete
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WindowsFormsApp1.exe
+D:\Pepperi\Pepperi SDK\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi-API-.Net-SDK-With-All-Demos\Pepperi.Demo.WinForms\obj\Debug\WindowsFormsApp1.pdb

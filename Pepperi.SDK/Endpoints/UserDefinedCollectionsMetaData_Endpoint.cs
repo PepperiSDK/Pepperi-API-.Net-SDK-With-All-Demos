@@ -16,8 +16,8 @@ namespace Pepperi.SDK.Endpoints
 
         #region Constructor
 
-        internal UserDefinedCollectionsMetaData_Endpoint(IAuthentication Authentication, ILogger Logger) :
-            base(Authentication, Logger)
+        internal UserDefinedCollectionsMetaData_Endpoint(IAuthentication Authentication, ILogger Logger, string papiBaseUri = null) :
+            base(Authentication, Logger, papiBaseUri: papiBaseUri)
         {
             //Note: RespourceName is empty
         }

@@ -75,6 +75,7 @@
     <Compile Include="Endpoints\Fixed\SurveysEndpoint.cs" />
     <Compile Include="Endpoints\InventoryEndpoint.cs" />
     <Compile Include="Endpoints\InventoryMetaData_Endpoint.cs" />
+    <Compile Include="Endpoints\IpaasApi\IpaasScheduledJobsEndpoint.cs" />
     <Compile Include="Endpoints\ItemDimensions1_MetaData_Endpoint.cs" />
     <Compile Include="Endpoints\ItemDimensions2_MetaData_Endpoint.cs" />
     <Compile Include="Endpoints\ItemPricesMetaData_Endpoint.cs" />
@@ -98,13 +99,16 @@
     <Compile Include="Endpoints\ItemDimensions2Endpoint.cs" />
     <Compile Include="Endpoints\UsersMetaData_Endpoint.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
+    <Compile Include="Exceptions\IpaasException.cs" />
     <Compile Include="Exceptions\PepperiException.cs" />
     <Compile Include="Helpers\ErrorHandlerHelpers.cs" />
+    <Compile Include="Helpers\IpaasHttpClient.cs" />
     <Compile Include="Helpers\PepperiFlatSerializer.cs" />
     <Compile Include="Helpers\PepperiHttpClient.cs" />
     <Compile Include="Helpers\PepperiJsonSerializer.cs" />
     <Compile Include="Helpers\PepperiLogger.cs" />
     <Compile Include="IpaasAddonAuthentification.cs" />
+    <Compile Include="IpaasApiClient.cs" />
     <Compile Include="Model\Account.cs" />
     <Compile Include="Model\AccountCatalog.cs" />
     <Compile Include="Model\AccountInventory.cs" />
@@ -118,6 +122,7 @@
     <Compile Include="Model\Fixed\ExportAsyncResponse.cs" />
     <Compile Include="Model\Fixed\FieldMetadata.cs" />
     <Compile Include="Model\Fixed\CommonModels.cs" />
+    <Compile Include="Model\Fixed\Generic\Common.cs" />
     <Compile Include="Model\Fixed\GetBulkJobInfoResponse.cs" />
     <Compile Include="Model\Fixed\GetExportJobInfoResponse.cs" />
     <Compile Include="Model\Fixed\Image.cs" />
@@ -130,10 +135,14 @@
     <Compile Include="Model\Fixed\Reference.cs" />
     <Compile Include="Model\Fixed\References.cs" />
     <Compile Include="Model\Fixed\Resources\Survey.cs" />
+    <Compile Include="Model\Fixed\Resources\SurveyTemplate.cs" />
     <Compile Include="Model\Fixed\TypeMetadata.cs" />
     <Compile Include="Model\Fixed\UserDefinedField.cs" />
     <Compile Include="Model\Fixed\UserDefinedTable.cs" />
     <Compile Include="Model\Inventory.cs" />
+    <Compile Include="Model\Ipaas\Enums.cs" />
+    <Compile Include="Model\Ipaas\IpaasGenericModels.cs" />
+    <Compile Include="Model\Ipaas\IpaasScheduledJobModels.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\ItemDimensions1.cs" />
     <Compile Include="Model\ItemDimensions2.cs" />

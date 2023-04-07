@@ -30,10 +30,11 @@ namespace Pepperi.SDK.Endpoints.Base
 
         #region constructor
 
-        protected BaseEndpoint_For_UserDefinedCollections(AuthentificationManager AuthentificationManager, ILogger Logger)
+        protected BaseEndpoint_For_UserDefinedCollections(AuthentificationManager AuthentificationManager, ILogger Logger,
+            string papiBaseUri = null, string ipaasBaseUrl = null)
         {
-            this.ApiBaseUri = "https://papi.pepperi.com/v1.0/"; // Will be moved to Pepperi API
-            this.IpaasBaseUri = "https://integration.pepperi.com/prod/api/"; // Will be moved to Pepperi API
+            this.ApiBaseUri = papiBaseUri;
+            this.IpaasBaseUri = ipaasBaseUrl;
             this.AuthentificationManager = AuthentificationManager;
             this.Logger = Logger;
 
