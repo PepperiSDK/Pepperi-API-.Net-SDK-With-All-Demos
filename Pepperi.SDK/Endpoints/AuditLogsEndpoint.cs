@@ -24,7 +24,7 @@ namespace Pepperi.SDK.Endpoints
             this.Logger = Logger;
         }
 
-        public PepperiAuditLog AuditLogPolling(string auditLogId, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        public PepperiAuditLog AuditLogPolling(string auditLogId, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
         {
             PepperiAuditLog result = null;
             var current = 0;

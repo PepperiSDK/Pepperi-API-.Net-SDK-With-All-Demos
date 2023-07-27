@@ -150,7 +150,7 @@ namespace Pepperi.SDK.Endpoints.Base
 
         #endregion
 
-        public UDC_UploadFile_Result BulkUploadFile(string schemeName, string filePath, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        public UDC_UploadFile_Result BulkUploadFile(string schemeName, string filePath, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
         {
             var fileExtention = GetValidatedFileExtention(filePath);
             var fileData = ReadFileByteArray(filePath);
@@ -158,13 +158,13 @@ namespace Pepperi.SDK.Endpoints.Base
             return BulkUploadFile(schemeName, fileData, fileExtention, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
         }
 
-        public UDC_UploadFile_Result BulkUploadViaFileApi<TData>(string schemeName, IEnumerable<TData> data, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        public UDC_UploadFile_Result BulkUploadViaFileApi<TData>(string schemeName, IEnumerable<TData> data, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
         {
             var jsonData = PepperiJsonSerializer.Serialize(data);
             return BulkUploadViaFileApi(schemeName, jsonData, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
         }
 
-        public UDC_UploadFile_Result BulkUploadViaFileApi(string schemeName, string jsonData, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        public UDC_UploadFile_Result BulkUploadViaFileApi(string schemeName, string jsonData, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
         {
             var byteData = Encoding.UTF8.GetBytes(jsonData);
             return BulkUploadFile(schemeName, byteData, ".json", overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
@@ -189,7 +189,7 @@ namespace Pepperi.SDK.Endpoints.Base
 
         #region Private Methods
 
-        private UDC_UploadFile_Result BulkUploadFile(string schemeName, byte[] data, string fileExtention, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        private UDC_UploadFile_Result BulkUploadFile(string schemeName, byte[] data, string fileExtention, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
         {
             ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
 
@@ -406,7 +406,7 @@ namespace Pepperi.SDK.Endpoints.Base
             return HttpResponseMessage.StatusCode;
         }
 
-        private PepperiAuditLog ImportFileToPepperi(string schemeName, string fileUrl, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        private PepperiAuditLog ImportFileToPepperi(string schemeName, string fileUrl, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
         {
             var importFileResponse = SendImportFileToPepperiRequest(schemeName, fileUrl, overwriteObject, overwriteTable);
             var auditLogId = importFileResponse.ExecutionUUID;
