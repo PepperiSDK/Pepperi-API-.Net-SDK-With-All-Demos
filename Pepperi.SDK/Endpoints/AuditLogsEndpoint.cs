@@ -38,10 +38,11 @@ namespace Pepperi.SDK.Endpoints
 
                 var statusId = log?.Status?.ID;
 
-                if (statusId != (int)ePepperiAuditLogStatus.InProgress)
+                result = log;
+
+                if (statusId == null || statusId == (int)ePepperiAuditLogStatus.Success || statusId == (int)ePepperiAuditLogStatus.Failure)
                 {
                     isStillPolling = false;
-                    result = log;
                 }
             }
 
@@ -64,6 +65,19 @@ namespace Pepperi.SDK.Endpoints
             PepperiHttpClient.HandleError(PepperiHttpClientResponse);
 
             return PepperiJsonSerializer.DeserializeOne<PepperiAuditLog>(PepperiHttpClientResponse.Body);
+        }
+
+        public void ValidateSuccessAuditLog(PepperiAuditLog auditLog, string processName = "Audit Log Pooling") {
+            ValuesValidator.Validate(auditLog, $"{processName} error. Audit Log is empty!", false);
+
+            var logStatusId = auditLog?.Status?.ID;
+            ValuesValidator.Validate(logStatusId != null, $"{processName} error. Can't get Audit Log Status ID!", false);
+            
+            ValuesValidator.Validate(logStatusId != (int)ePepperiAuditLogStatus.Failure, 
+                $"{processName} finished with \"Failure\" status! Error Message: {auditLog?.AuditInfo?.ErrorMessage ?? "No Message"}", false);
+
+            ValuesValidator.Validate(logStatusId == (int)ePepperiAuditLogStatus.Success, 
+                $"{processName} finished with \"{auditLog?.Status?.Name ?? logStatusId.ToString()}\" status! (Pooling may reached max number of attempts)", false);
         }
     }
 }

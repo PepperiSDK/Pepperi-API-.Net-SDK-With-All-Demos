@@ -79,8 +79,12 @@ namespace Pepperi.SDK.Model.Fixed
     }
 
     public enum ePepperiAuditLogStatus
-    {
-        Succeeded = 1,
-        InProgress = 2
+    {   
+        Failure = 0,
+        Success = 1,
+        InProgress = 2,
+        Skipped = 3,
+        InRetry = 4,
+        Started = 5
     }
 }

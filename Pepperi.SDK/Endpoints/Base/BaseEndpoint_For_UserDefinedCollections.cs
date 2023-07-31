@@ -289,9 +289,7 @@ namespace Pepperi.SDK.Endpoints.Base
             var auditLogId = exportFileResponse.ExecutionUUID;
             var finalAuditLog = this.AuditLogs.AuditLogPolling(auditLogId);
 
-            ValuesValidator.Validate(
-                finalAuditLog?.Status?.ID == (int)ePepperiAuditLogStatus.Succeeded,
-                $"Export File Finished with '{finalAuditLog?.Status?.Name ?? "Null"}' Status! Error Message - {finalAuditLog?.AuditInfo?.ErrorMessage ?? "No Message"}");
+            this.AuditLogs.ValidateSuccessAuditLog(finalAuditLog, "Export File");
 
             var resultObject = finalAuditLog?.AuditInfo?.ResultObject;
             ValuesValidator.Validate(resultObject, "Can't get result Object from final audit log!");
@@ -411,6 +409,8 @@ namespace Pepperi.SDK.Endpoints.Base
             var importFileResponse = SendImportFileToPepperiRequest(schemeName, fileUrl, overwriteObject, overwriteTable);
             var auditLogId = importFileResponse.ExecutionUUID;
             var finalAuditLog = this.AuditLogs.AuditLogPolling(auditLogId, poolingInternvalInMs, numberOfPoolingAttempts);
+
+            this.AuditLogs.ValidateSuccessAuditLog(finalAuditLog, "Import file");
             return finalAuditLog;
         }
 
@@ -513,10 +513,12 @@ namespace Pepperi.SDK.Endpoints.Base
         private UDC_UploadFile_Result GetImportFileDataResult(PepperiAuditLog auditLog)
         {
             var logResultObject = auditLog?.AuditInfo?.ResultObject;
+            ValuesValidator.Validate(logResultObject, $"Import File: Can't get Audit Log Result Object!", false);
+
             var parsedResultObject = PepperiJsonSerializer.DeserializeOne<UDC_UploadFile_AuditLog_ResultObject>(logResultObject);
             var url = parsedResultObject?.URI;
             ValuesValidator.Validate(url, "Can't get URI Response!");
-
+            
             var HttpClient = new HttpClient(new LoggingHandler(this.Logger)) { };
 
             //send request
