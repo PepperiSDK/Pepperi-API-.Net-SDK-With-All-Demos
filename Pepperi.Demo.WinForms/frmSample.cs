@@ -206,7 +206,7 @@ namespace WindowsFormsApp1
                 {
                     Logger.Log("Upload UDC Error, message - " + (ex?.Message ?? "No Message"));
                     pleaseWait.Close();
-                    MessageBox.Show("Error with importing scheme data!");
+                    MessageBox.Show("Error with importing scheme data! Error Message: " + (ex?.Message ?? "No Message"));
                     return;
                 }
                 

@@ -517,8 +517,9 @@ namespace Pepperi.SDK.Endpoints.Base
 
             var parsedResultObject = PepperiJsonSerializer.DeserializeOne<UDC_UploadFile_AuditLog_ResultObject>(logResultObject);
             var url = parsedResultObject?.URI;
-            ValuesValidator.Validate(url, "Can't get URI Response!");
-            
+
+            ValuesValidator.Validate(url, $"Can't get URI Response! Response Error Message: {parsedResultObject?.ErrorMessage ?? "No Message"}");
+
             var HttpClient = new HttpClient(new LoggingHandler(this.Logger)) { };
 
             //send request

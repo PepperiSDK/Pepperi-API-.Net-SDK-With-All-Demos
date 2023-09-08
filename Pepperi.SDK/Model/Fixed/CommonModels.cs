@@ -30,6 +30,7 @@ namespace Pepperi.SDK.Model.Fixed
     public class UDC_UploadFile_AuditLog_ResultObject
     {
         public string URI { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     public class UDC_UploadFile_Request
