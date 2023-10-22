@@ -8,23 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WinFormApiDemo
+namespace WinFormApiDemo.Surveys_Forms
 {
-    public partial class PleaseWaitForm : Form
+    public partial class GenericJsonResponseForm : Form
     {
-        public PleaseWaitForm()
+        public GenericJsonResponseForm()
         {
             InitializeComponent();
         }
 
-        private void PleaseWaitForm_Load(object sender, EventArgs e)
+        public void SetText(string value)
         {
-
+            this.responseTextBox.Text = value;
         }
 
-        public void ChangeMainLabel(string newLabel = "We are Loading your data...")
+        private void closeButton_Click(object sender, EventArgs e)
         {
-            this.mainLabel.Text = newLabel;
+            this.Close();
         }
     }
 }

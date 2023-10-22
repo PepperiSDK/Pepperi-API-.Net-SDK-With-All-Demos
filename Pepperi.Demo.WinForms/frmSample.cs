@@ -42,7 +42,11 @@ namespace WindowsFormsApp1
         private surveysResponseForm surveysResponseForm;
         private surveysUpsertForm surveysUpsertForm;
         private GetIpaasScheduledJobIdForm getIpaasScheduledJobIdForm = new GetIpaasScheduledJobIdForm();
+        private GetExportAsyncRequestDataForm GetExportAsyncRequestDataForm = new GetExportAsyncRequestDataForm();
+        private GenericJsonResponseForm GenericJsonResponseForm = new GenericJsonResponseForm();
+
         private IpaasRunJobResultForm IpaasRunJobResultForm = new IpaasRunJobResultForm();
+
         public frmSample()
         {
             InitializeComponent();
@@ -539,6 +543,60 @@ namespace WindowsFormsApp1
                 pleaseWait.Close();
                 MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
             }
+        }
+
+
+
+        private void udc_exportAsync_Click(object sender, EventArgs e)
+        {
+            if (GetExportAsyncRequestDataForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                pleaseWait.ChangeMainLabel("Sending request to export data...");
+                var exportAsyncResponse = ExportAsync(GetExportAsyncRequestDataForm);
+                var jobId = exportAsyncResponse.JobID;
+                pleaseWait.ChangeMainLabel($"Pooling data... Please wait");
+
+                var finalResult = client.UserDefinedTables.WaitForExportJobToComplete(jobId);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                ShowJson(PrettyJson(finalResult));
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private ExportAsyncResponse ExportAsync(GetExportAsyncRequestDataForm form)
+        {
+            return client.UserDefinedTables.ExportAsync(form.Where, form.OrderBy, form.IncludeDeleted, form.Fields, form.IsDistinct);
+        }
+
+        private string PrettyJson<TObject>(TObject data)
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(data,
+                                    Newtonsoft.Json.Formatting.Indented,
+                                    new Newtonsoft.Json.JsonSerializerSettings
+                                    {
+                                        NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
+                                        DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc //will serialize date time as utc
+                                    });
+        }
+
+        private void ShowJson(string json)
+        {
+            GenericJsonResponseForm.SetText(json);
+            GenericJsonResponseForm.ShowDialog();
         }
     }
 

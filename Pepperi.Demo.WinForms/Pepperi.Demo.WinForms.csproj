@@ -53,6 +53,18 @@
     <Compile Include="frmSample.Designer.cs">
       <DependentUpon>frmSample.cs</DependentUpon>
     </Compile>
+    <Compile Include="General Forms\GenericJsonResponseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GenericJsonResponseForm.Designer.cs">
+      <DependentUpon>GenericJsonResponseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="General Forms\GetExportAsyncRequestDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GetExportAsyncRequestDataForm.Designer.cs">
+      <DependentUpon>GetExportAsyncRequestDataForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="General Forms\GetRequestDataForm.cs">
       <SubType>Form</SubType>
     </Compile>

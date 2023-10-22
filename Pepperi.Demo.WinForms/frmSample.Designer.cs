@@ -55,15 +55,18 @@
             this.btnViewTemplates = new System.Windows.Forms.Button();
             this.surveysUpsert = new System.Windows.Forms.Button();
             this.getSurveys = new System.Windows.Forms.Button();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.ipaasJobsTabPage = new System.Windows.Forms.TabPage();
             this.ipaasRunJobButton = new System.Windows.Forms.Button();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.udc = new System.Windows.Forms.TabPage();
+            this.udc_exportAsync = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.ipaasJobsTab.SuspendLayout();
             this.Generic.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.Surveys.SuspendLayout();
             this.ipaasJobsTabPage.SuspendLayout();
+            this.udc.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnViewItems
@@ -235,6 +238,7 @@
             // ipaasJobsTab
             // 
             this.ipaasJobsTab.Controls.Add(this.Generic);
+            this.ipaasJobsTab.Controls.Add(this.udc);
             this.ipaasJobsTab.Controls.Add(this.tabPage2);
             this.ipaasJobsTab.Controls.Add(this.Surveys);
             this.ipaasJobsTab.Controls.Add(this.ipaasJobsTabPage);
@@ -371,6 +375,27 @@
             this.ipaasRunJobButton.UseVisualStyleBackColor = true;
             this.ipaasRunJobButton.Click += new System.EventHandler(this.ipaasRunJobButton_Click);
             // 
+            // udc
+            // 
+            this.udc.BackColor = System.Drawing.SystemColors.Control;
+            this.udc.Controls.Add(this.udc_exportAsync);
+            this.udc.Location = new System.Drawing.Point(4, 22);
+            this.udc.Name = "udc";
+            this.udc.Size = new System.Drawing.Size(854, 63);
+            this.udc.TabIndex = 4;
+            this.udc.Text = "User Defined Tables";
+            // 
+            // udc_exportAsync
+            // 
+            this.udc_exportAsync.Location = new System.Drawing.Point(2, 5);
+            this.udc_exportAsync.Margin = new System.Windows.Forms.Padding(2);
+            this.udc_exportAsync.Name = "udc_exportAsync";
+            this.udc_exportAsync.Size = new System.Drawing.Size(86, 52);
+            this.udc_exportAsync.TabIndex = 18;
+            this.udc_exportAsync.Text = "Export Async";
+            this.udc_exportAsync.UseVisualStyleBackColor = true;
+            this.udc_exportAsync.Click += new System.EventHandler(this.udc_exportAsync_Click);
+            // 
             // frmSample
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -398,6 +423,7 @@
             this.tabPage2.ResumeLayout(false);
             this.Surveys.ResumeLayout(false);
             this.ipaasJobsTabPage.ResumeLayout(false);
+            this.udc.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -435,6 +461,8 @@
         private System.Windows.Forms.Button btnViewTemplates;
         private System.Windows.Forms.TabPage ipaasJobsTabPage;
         private System.Windows.Forms.Button ipaasRunJobButton;
+        private System.Windows.Forms.TabPage udc;
+        private System.Windows.Forms.Button udc_exportAsync;
     }
 }
 

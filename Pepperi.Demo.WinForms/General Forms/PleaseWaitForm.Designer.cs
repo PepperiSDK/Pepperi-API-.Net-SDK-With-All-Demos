@@ -28,36 +28,36 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.mainLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // label1
+            // mainLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(24, 48);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(203, 20);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "We are Loading your data...";
+            this.mainLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.mainLabel.Location = new System.Drawing.Point(0, 0);
+            this.mainLabel.Name = "mainLabel";
+            this.mainLabel.Size = new System.Drawing.Size(333, 144);
+            this.mainLabel.TabIndex = 0;
+            this.mainLabel.Text = "We are Loading your data...";
+            this.mainLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // PleaseWaitForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(249, 122);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(333, 144);
+            this.Controls.Add(this.mainLabel);
             this.Name = "PleaseWaitForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Please Wait...";
             this.Load += new System.EventHandler(this.PleaseWaitForm_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label mainLabel;
     }
 }
