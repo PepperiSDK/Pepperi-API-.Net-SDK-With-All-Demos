@@ -47,6 +47,9 @@
             this.btnViewUdc = new System.Windows.Forms.Button();
             this.ipaasJobsTab = new System.Windows.Forms.TabControl();
             this.Generic = new System.Windows.Forms.TabPage();
+            this.udt = new System.Windows.Forms.TabPage();
+            this.udt_BulkUploadButton = new System.Windows.Forms.Button();
+            this.udt_exportAsync = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.DeleteSchemeButton = new System.Windows.Forms.Button();
             this.ExportDataFile = new System.Windows.Forms.Button();
@@ -58,15 +61,13 @@
             this.ipaasJobsTabPage = new System.Windows.Forms.TabPage();
             this.ipaasRunJobButton = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.udc = new System.Windows.Forms.TabPage();
-            this.udc_exportAsync = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.ipaasJobsTab.SuspendLayout();
             this.Generic.SuspendLayout();
+            this.udt.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.Surveys.SuspendLayout();
             this.ipaasJobsTabPage.SuspendLayout();
-            this.udc.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnViewItems
@@ -238,7 +239,7 @@
             // ipaasJobsTab
             // 
             this.ipaasJobsTab.Controls.Add(this.Generic);
-            this.ipaasJobsTab.Controls.Add(this.udc);
+            this.ipaasJobsTab.Controls.Add(this.udt);
             this.ipaasJobsTab.Controls.Add(this.tabPage2);
             this.ipaasJobsTab.Controls.Add(this.Surveys);
             this.ipaasJobsTab.Controls.Add(this.ipaasJobsTabPage);
@@ -261,6 +262,39 @@
             this.Generic.Size = new System.Drawing.Size(854, 63);
             this.Generic.TabIndex = 0;
             this.Generic.Text = "Generic";
+            // 
+            // udt
+            // 
+            this.udt.BackColor = System.Drawing.SystemColors.Control;
+            this.udt.Controls.Add(this.udt_BulkUploadButton);
+            this.udt.Controls.Add(this.udt_exportAsync);
+            this.udt.Location = new System.Drawing.Point(4, 22);
+            this.udt.Name = "udt";
+            this.udt.Size = new System.Drawing.Size(854, 63);
+            this.udt.TabIndex = 4;
+            this.udt.Text = "User Defined Tables";
+            // 
+            // udt_BulkUploadButton
+            // 
+            this.udt_BulkUploadButton.Location = new System.Drawing.Point(766, 5);
+            this.udt_BulkUploadButton.Margin = new System.Windows.Forms.Padding(2);
+            this.udt_BulkUploadButton.Name = "udt_BulkUploadButton";
+            this.udt_BulkUploadButton.Size = new System.Drawing.Size(86, 52);
+            this.udt_BulkUploadButton.TabIndex = 19;
+            this.udt_BulkUploadButton.Text = "Bulk Upload";
+            this.udt_BulkUploadButton.UseVisualStyleBackColor = true;
+            this.udt_BulkUploadButton.Click += new System.EventHandler(this.udt_BulkUploadButton_Click);
+            // 
+            // udt_exportAsync
+            // 
+            this.udt_exportAsync.Location = new System.Drawing.Point(2, 5);
+            this.udt_exportAsync.Margin = new System.Windows.Forms.Padding(2);
+            this.udt_exportAsync.Name = "udt_exportAsync";
+            this.udt_exportAsync.Size = new System.Drawing.Size(86, 52);
+            this.udt_exportAsync.TabIndex = 18;
+            this.udt_exportAsync.Text = "Export Async";
+            this.udt_exportAsync.UseVisualStyleBackColor = true;
+            this.udt_exportAsync.Click += new System.EventHandler(this.udt_exportAsync_Click);
             // 
             // tabPage2
             // 
@@ -375,27 +409,6 @@
             this.ipaasRunJobButton.UseVisualStyleBackColor = true;
             this.ipaasRunJobButton.Click += new System.EventHandler(this.ipaasRunJobButton_Click);
             // 
-            // udc
-            // 
-            this.udc.BackColor = System.Drawing.SystemColors.Control;
-            this.udc.Controls.Add(this.udc_exportAsync);
-            this.udc.Location = new System.Drawing.Point(4, 22);
-            this.udc.Name = "udc";
-            this.udc.Size = new System.Drawing.Size(854, 63);
-            this.udc.TabIndex = 4;
-            this.udc.Text = "User Defined Tables";
-            // 
-            // udc_exportAsync
-            // 
-            this.udc_exportAsync.Location = new System.Drawing.Point(2, 5);
-            this.udc_exportAsync.Margin = new System.Windows.Forms.Padding(2);
-            this.udc_exportAsync.Name = "udc_exportAsync";
-            this.udc_exportAsync.Size = new System.Drawing.Size(86, 52);
-            this.udc_exportAsync.TabIndex = 18;
-            this.udc_exportAsync.Text = "Export Async";
-            this.udc_exportAsync.UseVisualStyleBackColor = true;
-            this.udc_exportAsync.Click += new System.EventHandler(this.udc_exportAsync_Click);
-            // 
             // frmSample
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -420,10 +433,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ipaasJobsTab.ResumeLayout(false);
             this.Generic.ResumeLayout(false);
+            this.udt.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.Surveys.ResumeLayout(false);
             this.ipaasJobsTabPage.ResumeLayout(false);
-            this.udc.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -461,8 +474,9 @@
         private System.Windows.Forms.Button btnViewTemplates;
         private System.Windows.Forms.TabPage ipaasJobsTabPage;
         private System.Windows.Forms.Button ipaasRunJobButton;
-        private System.Windows.Forms.TabPage udc;
-        private System.Windows.Forms.Button udc_exportAsync;
+        private System.Windows.Forms.TabPage udt;
+        private System.Windows.Forms.Button udt_exportAsync;
+        private System.Windows.Forms.Button udt_BulkUploadButton;
     }
 }
 

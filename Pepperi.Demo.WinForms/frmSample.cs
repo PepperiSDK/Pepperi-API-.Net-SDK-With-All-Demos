@@ -17,6 +17,7 @@ using Pepperi.SDK.Model.Fixed.Resources;
 using WinFormApiDemo;
 using WinFormApiDemo.General_Forms;
 using WinFormApiDemo.Ipaas_Forms;
+using WinFormApiDemo.Model;
 using WinFormApiDemo.Surveys_Forms;
 using WinFormApiDemo.User_Defined_Collections_Forms;
 
@@ -46,6 +47,8 @@ namespace WindowsFormsApp1
         private GenericJsonResponseForm GenericJsonResponseForm = new GenericJsonResponseForm();
 
         private IpaasRunJobResultForm IpaasRunJobResultForm = new IpaasRunJobResultForm();
+
+        private StandardBulkUploadRequestForm UdtBulkUploadRequestForm = new StandardBulkUploadRequestForm();
 
         public frmSample()
         {
@@ -547,7 +550,9 @@ namespace WindowsFormsApp1
 
 
 
-        private void udc_exportAsync_Click(object sender, EventArgs e)
+        #region User Defined Collections (UDT)
+
+        private void udt_exportAsync_Click(object sender, EventArgs e)
         {
             if (GetExportAsyncRequestDataForm.ShowDialog() != DialogResult.OK) return;
 
@@ -576,6 +581,82 @@ namespace WindowsFormsApp1
                 MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
             }
         }
+
+        private void udt_BulkUploadButton_Click(object sender, EventArgs e)
+        {
+            if (UdtBulkUploadRequestForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var uploadType = UdtBulkUploadRequestForm.BulkUploadType;
+
+                var jobId = "";
+
+                pleaseWait.ChangeMainLabel("Sending Bulk Upload Request...");
+                if (uploadType == eStandardResources_BulkUploadType.Model)
+                {
+                    jobId = udt_BulkUploadButton_UploadModel();
+                }
+                else if (uploadType == eStandardResources_BulkUploadType.CsvPath)
+                {
+                    jobId = udt_BulkUploadButton_UploadCsv();
+                }
+                else
+                {
+                    throw new Exception("Incorrect Upload Type!");
+                }
+
+                if (string.IsNullOrEmpty(jobId)) throw new Exception("Can't get JobId from response!");
+
+                pleaseWait.ChangeMainLabel($"Waiting for job ({jobId}) to complete...");
+                var jobResult = client.UserDefinedTables.WaitForBulkJobToComplete(jobId);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                ShowJson(PrettyJson(jobResult));
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private string udt_BulkUploadButton_UploadModel()
+        {
+            var overwriteMethod = UdtBulkUploadRequestForm.ModelUpload_OverwriteMethod;
+            var bulkUploadMethod = UdtBulkUploadRequestForm.ModelUpload_BulkUploadMethod;
+            var fieldsToUpload = UdtBulkUploadRequestForm.ModelUpload_FieldsToUpload;
+            var saveZip = UdtBulkUploadRequestForm.ModelUpload_SaveZip;
+
+            var jsonData = UdtBulkUploadRequestForm.ParseUploadModelData<UserDefinedTable>();
+
+            var bulkUploadResult = client.UserDefinedTables.BulkUpload(jsonData, overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+
+            return bulkUploadResult.JobID;
+        }
+
+        private string udt_BulkUploadButton_UploadCsv()
+        {
+            var overwriteMethod = UdtBulkUploadRequestForm.CsvUpload_OverwriteMethod;
+            var filePath = UdtBulkUploadRequestForm.CsvUpload_FilePath;
+            var zipFilePath = UdtBulkUploadRequestForm.CsvUpload_FilePathToStoreZipFile;
+            var encoding = UdtBulkUploadRequestForm.CsvUpload_FileEncoding;
+
+            var bulkUploadResult = client.UserDefinedTables.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+
+            return bulkUploadResult.JobID;
+        }
+
+
+        #endregion
+
 
         private ExportAsyncResponse ExportAsync(GetExportAsyncRequestDataForm form)
         {
