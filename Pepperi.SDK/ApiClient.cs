@@ -98,6 +98,9 @@ namespace Pepperi.SDK
             this.UserDefinedCollections = new UserDefinedCollectionsEndpoint(AuthentificationManager, Logger, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl);
 
             this.Surveys = new SurveysEndpoint(AuthentificationManager, Logger, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl);
+            this.Notifications = new NotificationsEndpoint(AuthentificationManager, Logger, papiBaseUri: papiBaseUri, ipaasBaseUrl: ipaasBaseUrl);
+
+
 
             this.Ipaas = new IpaasApiClient(ipaasBaseUrl: ipaasBaseUrl, Logger: Logger, AuthentificationManager: AuthentificationManager);
         }
@@ -180,6 +183,7 @@ namespace Pepperi.SDK
         public UserDefinedCollectionsEndpoint UserDefinedCollections { get; private set; }
 
         public SurveysEndpoint Surveys { get; private set; }
+        public NotificationsEndpoint Notifications { get; private set; }
 
         public IpaasApiClient Ipaas { get; private set; }
         #endregion
