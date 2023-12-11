@@ -35,13 +35,16 @@ namespace Pepperi.SDK.Endpoints.ipaasApi
 
         #region Public Methods
 
-        public IpaasDataUrls RunJob(int jobId)
+        public IpaasDataUrls RunJob(int jobId, string jsonBody = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
             Log($"RunJob started, jobId - {jobId}");
-            var jobLogId = CallRunJob(jobId);
+            var jobLogId = CallRunJob(jobId, jsonBody);
 
             Log($"Call Run Job returned log with {jobLogId} Id, starting pooling...");
-            var finalLog = JobStatusPooling(jobLogId);
+            var finalLog = JobStatusPooling(jobLogId, new PoolingConfig(
+                poolingInternvalInMs: poolingInternvalInMs,
+                numberOfPoolingAttempts: numberOfPoolingAttempts
+                ));
 
             ValuesValidator.Validate(finalLog, $"Final Log is null!");
             ValuesValidator.Validate(finalLog.RunStatusId != (int)eScheduledJobRunStatus.Running, $"Max Pooling time was exided! Job is still in Running status!", false);
@@ -57,11 +60,19 @@ namespace Pepperi.SDK.Endpoints.ipaasApi
 
         #region Private Methods
 
-        private int CallRunJob(int jobId)
+        private int CallRunJob(int jobId, string jsonBody = null)
         {
-            var url = $"ClientTask/CallRunJob?ScheduledJobId={jobId}";
+            // Start job uses post with data inside body, that can be used as params inside job tasks
+            var isStartJobRequest = jsonBody != null;
 
-            var response = IpaasHttpClient.Get<IEnumerable<IpaasStartScheduledJobResponse>>(url);
+            var url = isStartJobRequest ?
+                $"ClientTask/StartJob?JobId={jobId}" :
+                $"ClientTask/CallRunJob?ScheduledJobId={jobId}";
+
+            var response = isStartJobRequest ?
+                IpaasHttpClient.PostJson<IEnumerable<IpaasStartScheduledJobResponse>>(url, jsonBody) : // start job
+                IpaasHttpClient.Get<IEnumerable<IpaasStartScheduledJobResponse>>(url); // call run job
+
             var startJobResponse = response?.FirstOrDefault();
             ValuesValidator.Validate(startJobResponse, "Can't get correct start job response!");
 
@@ -84,13 +95,13 @@ namespace Pepperi.SDK.Endpoints.ipaasApi
             IpaasScheduledJobLogStatusApi finalLog = null;
 
             Log($"JobStatusPooling start");
-            Log($"MaxMinutesToPool - {poolingConfig.MaxMinutesToPool}");
+            Log($"NumberOfPoolingAttempts - {poolingConfig.NumberOfPoolingAttempts}");
             Log($"PoolingInternvalInMs - {poolingConfig.PoolingInternvalInMs}");
 
             var startDateTime = DateTime.UtcNow;
-            var endingDateTime = DateTime.UtcNow.AddMinutes(poolingConfig.MaxMinutesToPool);
+            var numberOfPoolingAttempts = poolingConfig.NumberOfPoolingAttempts;
 
-            while (DateTime.UtcNow <= endingDateTime && shouldPool)
+            while (current < numberOfPoolingAttempts && shouldPool)
             {
                 Thread.Sleep(poolingConfig.PoolingInternvalInMs);
                 current++;
@@ -137,6 +148,7 @@ namespace Pepperi.SDK.Endpoints.ipaasApi
         {
             this.Logger.Log(message + "\r\n");
         }
+
         #endregion
     }
 }

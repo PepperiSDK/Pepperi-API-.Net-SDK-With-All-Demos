@@ -57,6 +57,11 @@ namespace Pepperi.SDK.Helpers
 
         internal TResult PostJson<TData, TResult>(string requestUri, TData data, bool isMinifiedLog = false)
         {
+            return PostJson<TResult>(requestUri, PepperiJsonSerializer.Serialize(data), isMinifiedLog);
+        }
+
+        internal TResult PostJson<TResult>(string requestUri, string data, bool isMinifiedLog = false)
+        {
             var response = PostJson(requestUri, data, isMinifiedLog);
             var parsed = PepperiJsonSerializer.DeserializeOne<IpaasGenericResponse<TResult>>(response.Body);
             ValuesValidator.Validate(parsed, "Can't correctly parse response!");
@@ -64,6 +69,11 @@ namespace Pepperi.SDK.Helpers
         }
 
         internal IpaasHttpClientResponse PostJson<TData>(string requestUri, TData data, bool isMinifiedLog = false)
+        {
+            return PostJson(requestUri, PepperiJsonSerializer.Serialize(data), isMinifiedLog);
+        }
+
+        internal IpaasHttpClientResponse PostJson(string requestUri, string data, bool isMinifiedLog = false)
         {
             string contentType = "application/json";
             string accept = "application/json";
@@ -73,7 +83,7 @@ namespace Pepperi.SDK.Helpers
                     this.IpaasBaseUri,
                     requestUri,
                     new Dictionary<string, string>() { },
-                    PepperiJsonSerializer.Serialize(data),
+                    data,
                     contentType,
                     accept,
                     isMinifiedLog

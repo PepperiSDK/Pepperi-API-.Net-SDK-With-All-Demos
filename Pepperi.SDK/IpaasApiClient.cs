@@ -17,8 +17,6 @@ namespace Pepperi.SDK
         #endregion
         public IpaasApiClient(string ipaasBaseUrl, ILogger Logger, AuthentificationManager AuthentificationManager)
         {
-            // Available for this endpoint version
-            ipaasBaseUrl = "https://ipaas.pepperi.com/prod/api/";
             Initialize(ipaasBaseUrl, Logger, AuthentificationManager);
         }
 

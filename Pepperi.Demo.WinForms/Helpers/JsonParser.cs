@@ -20,6 +20,18 @@ namespace WinFormApiDemo.Helpers
                                     });
         }
 
+        internal static TData TryDeserialize<TData>(string data)
+        {
+            try
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<TData>(data);
+            }
+            catch (Exception)
+            {
+                return default(TData);
+            }
+        }
+
         internal static TData Deserialize<TData>(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<TData>(data);

@@ -42,7 +42,7 @@ namespace WindowsFormsApp1
         private udcSchemeSelectorForm udcSchemeSelectorForm;
         private surveysResponseForm surveysResponseForm;
         private surveysUpsertForm surveysUpsertForm;
-        private GetIpaasScheduledJobIdForm getIpaasScheduledJobIdForm = new GetIpaasScheduledJobIdForm();
+        private GetIpaasStartScheduledJobInfoForm getIpaasScheduledJobIdForm = new GetIpaasStartScheduledJobInfoForm();
         private GetExportAsyncRequestDataForm GetExportAsyncRequestDataForm = new GetExportAsyncRequestDataForm();
         private GenericJsonResponseForm GenericJsonResponseForm = new GenericJsonResponseForm();
 
@@ -527,6 +527,7 @@ namespace WindowsFormsApp1
         {
             if (getIpaasScheduledJobIdForm.ShowDialog() != DialogResult.OK) return;
             var jobId = getIpaasScheduledJobIdForm.JobId;
+            var jsonData = String.IsNullOrWhiteSpace(getIpaasScheduledJobIdForm.JsonData) ? null : getIpaasScheduledJobIdForm.JsonData;
 
             var pleaseWait = new PleaseWaitForm();
             pleaseWait.Show();
@@ -534,7 +535,8 @@ namespace WindowsFormsApp1
 
             try
             {
-                var dataUrls = client.Ipaas.ScheduledJobs.RunJob(jobId);
+                var dataUrls = client.Ipaas.ScheduledJobs.RunJob(jobId, jsonData);
+
                 pleaseWait.Close();
 
                 IpaasRunJobResultForm.dataGridView = dataGridView1;

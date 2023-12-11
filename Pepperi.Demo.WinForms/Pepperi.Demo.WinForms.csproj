@@ -84,11 +84,11 @@
       <DependentUpon>StandardBulkUploadRequestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\JsonParser.cs" />
-    <Compile Include="Ipaas Forms\GetIpaasScheduledJobIdForm.cs">
+    <Compile Include="Ipaas Forms\GetIpaasStartScheduledJobInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Ipaas Forms\GetIpaasScheduledJobIdForm.Designer.cs">
-      <DependentUpon>GetIpaasScheduledJobIdForm.cs</DependentUpon>
+    <Compile Include="Ipaas Forms\GetIpaasStartScheduledJobInfoForm.Designer.cs">
+      <DependentUpon>GetIpaasStartScheduledJobInfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Ipaas Forms\IpaasRunJobResultForm.cs">
       <SubType>Form</SubType>
@@ -138,8 +138,8 @@
     <EmbeddedResource Include="General Forms\PleaseWaitForm.resx">
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Ipaas Forms\GetIpaasScheduledJobIdForm.resx">
-      <DependentUpon>GetIpaasScheduledJobIdForm.cs</DependentUpon>
+    <EmbeddedResource Include="Ipaas Forms\GetIpaasStartScheduledJobInfoForm.resx">
+      <DependentUpon>GetIpaasStartScheduledJobInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Ipaas Forms\IpaasRunJobResultForm.resx">
       <DependentUpon>IpaasRunJobResultForm.cs</DependentUpon>
