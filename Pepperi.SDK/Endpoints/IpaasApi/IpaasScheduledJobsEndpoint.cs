@@ -38,6 +38,14 @@ namespace Pepperi.SDK.Endpoints.ipaasApi
         public IpaasDataUrls RunJob(int jobId, string jsonBody = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
             Log($"RunJob started, jobId - {jobId}");
+
+            // Validating max pooling time
+            var maxPoolingTimeMs = 1000 * 60 * 15; // 15 minutes
+            var totalPoolingTime = poolingInternvalInMs * numberOfPoolingAttempts;
+            ValuesValidator.Validate(poolingInternvalInMs > 0, "poolingInternvalInMs should be > 0!");
+            ValuesValidator.Validate(numberOfPoolingAttempts > 0, "numberOfPoolingAttempts should be > 0!");
+            ValuesValidator.Validate(totalPoolingTime <= maxPoolingTimeMs, $"Max Polling should be less than 15 minutes (interval * NumberOfAttempts), but got {totalPoolingTime}");
+
             var jobLogId = CallRunJob(jobId, jsonBody);
 
             Log($"Call Run Job returned log with {jobLogId} Id, starting pooling...");
