@@ -63,6 +63,7 @@
     <Compile Include="Endpoints\ActivitiesMetaData_Endpoint.cs" />
     <Compile Include="Endpoints\AuditLogsEndpoint.cs" />
     <Compile Include="Endpoints\Base\BaseEndpoint.cs" />
+    <Compile Include="Endpoints\Base\BaseEndpoint_For_GenericResources.cs" />
     <Compile Include="Endpoints\Base\BaseEndpoint_For_UserDefinedCollections.cs" />
     <Compile Include="Endpoints\Base\Metadata_BaseEndpoint_For_StandardResource.cs" />
     <Compile Include="Endpoints\Base\Metadata_BaseEndpoint_For_TypedResource.cs" />
@@ -72,7 +73,9 @@
     <Compile Include="Endpoints\CatalogsMetaData_Endpoint.cs" />
     <Compile Include="Endpoints\ContactsEndpoint.cs" />
     <Compile Include="Endpoints\ContactsMetaData_Endpoint.cs" />
+    <Compile Include="Endpoints\Fixed\JourneysEndpoint.cs" />
     <Compile Include="Endpoints\Fixed\NotificationsEndpoint.cs" />
+    <Compile Include="Endpoints\Fixed\RelatedItemsEndpoint.cs" />
     <Compile Include="Endpoints\Fixed\SurveysEndpoint.cs" />
     <Compile Include="Endpoints\InventoryEndpoint.cs" />
     <Compile Include="Endpoints\InventoryMetaData_Endpoint.cs" />
@@ -104,6 +107,7 @@
     <Compile Include="Exceptions\PepperiException.cs" />
     <Compile Include="Helpers\ErrorHandlerHelpers.cs" />
     <Compile Include="Helpers\IpaasHttpClient.cs" />
+    <Compile Include="Helpers\Parsers.cs" />
     <Compile Include="Helpers\PepperiFlatSerializer.cs" />
     <Compile Include="Helpers\PepperiHttpClient.cs" />
     <Compile Include="Helpers\PepperiJsonSerializer.cs" />
@@ -135,7 +139,9 @@
     <Compile Include="Model\Fixed\PepperiAuditLog.cs" />
     <Compile Include="Model\Fixed\Reference.cs" />
     <Compile Include="Model\Fixed\References.cs" />
+    <Compile Include="Model\Fixed\Resources\Journey.cs" />
     <Compile Include="Model\Fixed\Resources\Notification.cs" />
+    <Compile Include="Model\Fixed\Resources\RelatedItem.cs" />
     <Compile Include="Model\Fixed\Resources\Survey.cs" />
     <Compile Include="Model\Fixed\Resources\SurveyTemplate.cs" />
     <Compile Include="Model\Fixed\TypeMetadata.cs" />

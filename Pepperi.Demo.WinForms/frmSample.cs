@@ -18,8 +18,10 @@ using WinFormApiDemo;
 using WinFormApiDemo.General_Forms;
 using WinFormApiDemo.Ipaas_Forms;
 using WinFormApiDemo.Model;
+using WinFormApiDemo.PepperiResoursesForms.Journeys;
 using WinFormApiDemo.Surveys_Forms;
 using WinFormApiDemo.User_Defined_Collections_Forms;
+using WinFormApiDemo.Helpers;
 
 namespace WindowsFormsApp1
 {
@@ -32,6 +34,7 @@ namespace WindowsFormsApp1
         private string DeveloperKey = "8JZNRlMG2gFeudl51qNFHOMGPSV0XXPP";
         private string CompanyToken = "";
         private string APIBaseAddress = "https://api.pepperi.com/v1.0/";
+        private string IpaasBaseUrl = "https://integration.pepperi.com/prod/api/";
         PepperiLogger Logger = new PepperiLogger();
         private string schecma = "";
         private IEnumerable<string> udcNames = null;
@@ -43,17 +46,59 @@ namespace WindowsFormsApp1
         private surveysResponseForm surveysResponseForm;
         private surveysUpsertForm surveysUpsertForm;
         private GetIpaasStartScheduledJobInfoForm getIpaasScheduledJobIdForm = new GetIpaasStartScheduledJobInfoForm();
-        private GetExportAsyncRequestDataForm GetExportAsyncRequestDataForm = new GetExportAsyncRequestDataForm();
+        private GetExportAsyncRequestDataForm GetExportAsyncRequestDataForm =
+            new GetExportAsyncRequestDataForm();
         private GenericJsonResponseForm GenericJsonResponseForm = new GenericJsonResponseForm();
+        private GetRequestDataDynamicForm GetRequestDataDynamicForm = new GetRequestDataDynamicForm();
+        private GetKeyGenericForm GetKeyGenericForm = new GetKeyGenericForm();
 
         private IpaasRunJobResultForm IpaasRunJobResultForm = new IpaasRunJobResultForm();
 
-        private StandardBulkUploadRequestForm UdtBulkUploadRequestForm = new StandardBulkUploadRequestForm();
+        private StandardBulkUploadRequestForm StandardBulkUploadRequestForm = new StandardBulkUploadRequestForm();
+
+        private GR_ExportFileConfiguration GR_ExportFileConfiguration = new GR_ExportFileConfiguration();
+
+        private GetJsonToUseForm Notifications_JsonToUseForm { get; set; } = new GetJsonToUseForm("Notification JSON to POST", defaultJson: PrettyJson(new Notification()
+        {
+            Body = "Body",
+            Title = "Title",
+            UserEmail = "yourEmail",
+            NavigationPath = "The destination path when clicking the notification"
+        }), shouldBeOnlySingleObject: true);
+        private JourneysSearchFilesForm JourneysSearchFilesForm { get; set; }
+
+        private GetJsonToUseForm RelatedItems_JsonToUseForm { get; set; } = new GetJsonToUseForm("Related Item JSON to Upsert", defaultJson: PrettyJson(new RelatedItem()
+        {
+            CollectionName = "RelatedItemsCollection1",
+            ItemExternalID = "Item1",
+            RelatedItems = new List<string>() { "Item2", "Item3" }
+        }), shouldBeOnlySingleObject: true);
+
+        #region This Form Methods
 
         public frmSample()
         {
             InitializeComponent();
             dataGridView1.ColumnHeaderMouseClick += dataGridView_ColumnHeaderMouseClick;
+
+            InitCustomComponents();
+        }
+
+        private void InitCustomComponents()
+        {
+
+            #region Main Resource DropDown
+
+            var bindingSource1 = new BindingSource
+            {
+                DataSource = GenerateMainResoourcesDropDownList()
+            };
+            MainResources_ResourceToUse.DataSource = bindingSource1.DataSource;
+            MainResources_ResourceToUse.DisplayMember = "Text";
+            MainResources_ResourceToUse.ValueMember = "Value";
+
+            #endregion
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -121,25 +166,81 @@ namespace WindowsFormsApp1
         {
             try
             {
-                var token = PrivateAuthentication.GetAPITokenData(APIBaseAddress, DeveloperKey, txtEmail.Text, txtPassword.Text, Logger);
-                if (token.APIToken == Guid.Empty.ToString())
-                    throw new Exception("user or passsword are incorrect.");
-                txtToken.Text = token.APIToken;
-                System.IO.File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt", token.APIToken);
-                auth = new PrivateAuthentication(DeveloperKey, token.APIToken);
+                var userName = txtEmail.Text;
+                var password = txtPassword.Text;
 
-                var authentificationManager = new AuthentificationManager(Logger, token.APIToken, DeveloperKey);
-                client = new ApiClient(APIBaseAddress, auth, Logger, AuthentificationManager: authentificationManager);
-                udcSchemeSelectorForm = new udcSchemeSelectorForm()
-                {
-                    Client = client
-                };
-                MessageBox.Show("Connected!");
+                var token = GetToken(userName, password, "User or Passsword are incorrect!");
+                SaveToken(token);
+                txtToken.Text = token;
+
+                InitClientApi(token);
+                MessageBox.Show("Connected succesfully!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show("Not Connected!. reason: " + ex.ToString ());
+                MessageBox.Show("Not Connected!. reason: " + ex.ToString());
             }
+        }
+
+        private void SaveAndUseToken_Button_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var token = txtToken.Text;
+                ValuesValidator.Validate(token, "Token is empty!");
+
+                GetToken("TokenAuth", token, "Provided Token is incorrect!");
+                SaveToken(token);
+
+                InitClientApi(token);
+                MessageBox.Show("Token was saved succesfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error! Reason: " + (ex?.Message ?? ex.ToString()));
+            }
+        }
+
+        private string GetToken(string username, string password, string errorMessage = "User, Passsword or Token are incorrect!")
+        {
+            var response = PrivateAuthentication.GetAPITokenData(APIBaseAddress, DeveloperKey, username, password, Logger);
+            var token = response?.APIToken;
+
+            ValuesValidator.Validate(token, errorMessage, false);
+            return token;
+        }
+
+        private void InitClientApi(string token)
+        {
+            auth = new PrivateAuthentication(DeveloperKey, token);
+
+            var authentificationManager = new AuthentificationManager(Logger, token, DeveloperKey);
+            client = new ApiClient(APIBaseAddress, auth, Logger, AuthentificationManager: authentificationManager, ipaasBaseUrl: this.IpaasBaseUrl);
+
+            udcSchemeSelectorForm = new udcSchemeSelectorForm()
+            {
+                Client = client
+            };
+
+            this.JourneysSearchFilesForm = new JourneysSearchFilesForm(client);
+
+            if (surveysResponseForm == null) surveysResponseForm = new surveysResponseForm();
+            if (surveysUpsertForm == null) surveysUpsertForm = new surveysUpsertForm();
+        }
+
+        private void SaveToken(string token)
+        {
+            System.IO.File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt", token);
+        }
+
+        private string GetSaveToken()
+        {
+            return System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt");
+        }
+
+        private bool IsSavedTokenExist()
+        {
+            return System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "token.txt");
         }
 
         private void frmSample_Load(object sender, EventArgs e)
@@ -147,23 +248,11 @@ namespace WindowsFormsApp1
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls12
             | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
 
-            if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "token.txt"))
-            {
-                txtToken.Text = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "token.txt");
-                CompanyToken = txtToken.Text;
-                auth = new Pepperi.SDK.PrivateAuthentication(DeveloperKey, CompanyToken);
-                var authentificationManager = new AuthentificationManager(Logger, CompanyToken, DeveloperKey);
-                client = new ApiClient(APIBaseAddress, auth, new PepperiLogger(), 
-                    AuthentificationManager: authentificationManager);
+            if (!IsSavedTokenExist()) return;
 
-                udcSchemeSelectorForm = new udcSchemeSelectorForm()
-                {
-                    Client = client
-                };
-
-                surveysResponseForm = new surveysResponseForm();
-                surveysUpsertForm = new surveysUpsertForm();
-            }
+            var token = GetSaveToken();
+            txtToken.Text = token;
+            InitClientApi(token);
         }
 
 
@@ -171,13 +260,17 @@ namespace WindowsFormsApp1
         {
             JArray sorted;
             if (sortAscending)
-                 sorted = new JArray(response.OrderBy(obj => (string)obj[dataGridView1.Columns[e.ColumnIndex].DataPropertyName]));
+                sorted = new JArray(response.OrderBy(obj => (string)obj[dataGridView1.Columns[e.ColumnIndex].DataPropertyName]));
             else
                 sorted = new JArray(response.OrderByDescending(obj => (string)obj[dataGridView1.Columns[e.ColumnIndex].DataPropertyName]));
             sortAscending = !sortAscending;
 
             dataGridView1.DataSource = sorted;
         }
+
+        #endregion
+
+        #region User Defined Collections (UDC)
 
         private void btnUploadUdc_Click(object sender, EventArgs e)
         {
@@ -186,7 +279,8 @@ namespace WindowsFormsApp1
 
             var overwrite = false;
             var overwriteObject = false;
-            using (var configForm = new udcUploadConfigurationForm()) {
+            using (var configForm = new udcUploadConfigurationForm())
+            {
                 if (configForm.ShowDialog() != DialogResult.OK)
                 {
                     return;
@@ -197,7 +291,7 @@ namespace WindowsFormsApp1
 
             openFileDialog1.ShowDialog();
             string file = openFileDialog1.FileName;
-            if(file!= "openFileDialog1" && schecma!="")
+            if (file != "openFileDialog1" && schecma != "")
             {
                 UDC_UploadFile_Result response = null;
 
@@ -216,7 +310,7 @@ namespace WindowsFormsApp1
                     MessageBox.Show("Error with importing scheme data! Error Message: " + (ex?.Message ?? "No Message"));
                     return;
                 }
-                
+
                 string message = "";
                 if (response.TotalFailed == 0)
                 {
@@ -246,7 +340,8 @@ namespace WindowsFormsApp1
         private void btnViewUdc_Click(object sender, EventArgs e)
         {
             schecma = ProccedUdcFormSelection();
-            if (schecma == null) {
+            if (schecma == null)
+            {
                 return;
             }
 
@@ -285,13 +380,14 @@ namespace WindowsFormsApp1
                         columns["Key"].DisplayIndex = 0;
                 }
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 dataGridView1.DataSource = response;
             }
-            
+
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void Udc_ViewSchemes_Button_Click(object sender, EventArgs e)
         {
             PleaseWaitForm pleaseWait = new PleaseWaitForm();
             pleaseWait.Show();
@@ -316,7 +412,8 @@ namespace WindowsFormsApp1
             dataGridView1.DataSource = collections;
         }
 
-        private string ProccedUdcFormSelection() {
+        private string ProccedUdcFormSelection()
+        {
             List<string> collections = new List<string>();
             PleaseWaitForm pleaseWait = new PleaseWaitForm();
             if (udcNames == null)
@@ -336,7 +433,7 @@ namespace WindowsFormsApp1
                 {
                     pleaseWait.Close();
                     MessageBox.Show("Error with retrieving schemes names!");
-                    throw;
+                    return null;
                 }
             }
 
@@ -359,10 +456,10 @@ namespace WindowsFormsApp1
             var where = udcExportFileConfiguration.Where;
             var format = udcExportFileConfiguration.Format;
             var excludedKeys = udcExportFileConfiguration.ExcludedKeys;
-            var includeDeleted = udcExportFileConfiguration.IncludeDeleted;
 
             var fodlerSelectionResult = folderBrowserDialog1.ShowDialog();
-            if (fodlerSelectionResult != DialogResult.OK) {
+            if (fodlerSelectionResult != DialogResult.OK)
+            {
                 return;
             }
             var folderPath = folderBrowserDialog1.SelectedPath;
@@ -401,7 +498,8 @@ namespace WindowsFormsApp1
             {
                 client.UserDefinedCollectionsMetaData.DeleteUserDefinedCollection(schecma);
                 var existingSchemes = udcSchemeSelectorForm.GetComboBoxValues();
-                if (existingSchemes != null && existingSchemes.Count() > 0) {
+                if (existingSchemes != null && existingSchemes.Count() > 0)
+                {
                     var newSchemes = existingSchemes.Where(schemeName => schemeName != schecma).ToList();
                     udcSchemeSelectorForm.SetComboBoxValues(newSchemes);
                     udcNames = newSchemes;
@@ -416,6 +514,10 @@ namespace WindowsFormsApp1
                 MessageBox.Show($"Error with Scheme Delete! Message - {exc?.Message ?? "No Message"}");
             }
         }
+
+        #endregion
+
+        #region Surveys
 
         private void getSurveys_Click(object sender, EventArgs e)
         {
@@ -451,7 +553,7 @@ namespace WindowsFormsApp1
                 pleaseWait.Close();
                 MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
             }
-            
+
         }
 
         private void surveysUpsert_Click(object sender, EventArgs e)
@@ -523,6 +625,10 @@ namespace WindowsFormsApp1
             }
         }
 
+        #endregion
+
+        #region Ipaas
+
         private void ipaasRunJobButton_Click(object sender, EventArgs e)
         {
             if (getIpaasScheduledJobIdForm.ShowDialog() != DialogResult.OK) return;
@@ -550,13 +656,429 @@ namespace WindowsFormsApp1
             }
         }
 
+        #endregion
 
+        #region Journeys
 
-        #region User Defined Collections (UDT)
-
-        private void udt_exportAsync_Click(object sender, EventArgs e)
+        private void JourneysSearchFiles_Click(object sender, EventArgs e)
         {
-            if (GetExportAsyncRequestDataForm.ShowDialog() != DialogResult.OK) return;
+            JourneysSearchFilesForm.ShowDialog();
+        }
+
+        #endregion
+
+        #region Notifications
+
+        private void NotificationsFindButton_Click(object sender, EventArgs e)
+        {
+            GetRequestDataDynamicForm.PrepareFrom(new GetRequestDataDynamicFormPrepareParams()
+            {
+                OpenFor = "NotificationsGet",
+                UseWhereInput = true,
+                UseOrderByInput = true,
+                UseFieldsInput = true
+            });
+            if (GetRequestDataDynamicForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var where = GetRequestDataDynamicForm.Where;
+                var orderBy = GetRequestDataDynamicForm.OrderBy;
+                var fields = GetRequestDataDynamicForm.Fields;
+
+                var finalResult = client.Notifications.Find(where: where, order_by: orderBy, fields: fields);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                if (NotificationsShowJsonCheckbox.Checked)
+                {
+                    ShowJson(PrettyJson(finalResult));
+                }
+                dataGridView1.DataSource = finalResult;
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private void Notifications_PostButton_Click(object sender, EventArgs e)
+        {
+            if (Notifications_JsonToUseForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var json = Notifications_JsonToUseForm.JsonString;
+                var notification = ParseJson<Notification>(json);
+                var finalResult = client.Notifications.Post(notification);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                ShowJson(PrettyJson(finalResult));
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        #endregion
+
+        #region Related Items
+
+        private void RelatedItems_FindButton_Click(object sender, EventArgs e)
+        {
+            GetRequestDataDynamicForm.PrepareFrom(new GetRequestDataDynamicFormPrepareParams()
+            {
+                OpenFor = "RelatedItemsFind",
+                UseWhereInput = true,
+                UseFieldsInput = true,
+                UseOrderByInput = true,
+                UsePageInput = true,
+                UsePageSizeInput = true
+            });
+            if (GetRequestDataDynamicForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var where = GetRequestDataDynamicForm.Where;
+                var fields = GetRequestDataDynamicForm.Fields;
+                var order_by = GetRequestDataDynamicForm.OrderBy;
+                var page = GetRequestDataDynamicForm.Page;
+                var page_size = GetRequestDataDynamicForm.PageSize;
+
+                var finalResult = client.RelatedItems.Find(
+                    where: where, fields: fields, order_by: order_by,
+                    page: page, page_size: page_size
+                    );
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                if (RelatedItems_ShowJsonCheckbox.Checked)
+                {
+                    ShowJson(PrettyJson(finalResult));
+                }
+
+                dataGridView1.DataSource = finalResult;
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private void RelatedItems_FindByKeyButton_Click(object sender, EventArgs e)
+        {
+            GetKeyGenericForm.PrepareFrom("RelatedItemsFindByKey");
+            if (GetKeyGenericForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var key = GetKeyGenericForm.Key;
+
+                var finalResult = client.RelatedItems.FindByKey(key: key);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                if (RelatedItems_ShowJsonCheckbox.Checked)
+                {
+                    ShowJson(PrettyJson(finalResult));
+                }
+
+                dataGridView1.DataSource = new List<RelatedItem>() { finalResult };
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private void RelatedItems_UpsertButton_Click(object sender, EventArgs e)
+        {
+            if (RelatedItems_JsonToUseForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var json = RelatedItems_JsonToUseForm.JsonString;
+                var relatedItem = ParseJson<RelatedItem>(json);
+
+                var finalResult = client.RelatedItems.Upsert(relatedItem);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                if (RelatedItems_ShowJsonCheckbox.Checked)
+                {
+                    ShowJson(PrettyJson(finalResult));
+                }
+
+                dataGridView1.DataSource = new List<RelatedItem>() { finalResult };
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private void RelatedItems_ExportAsyncButton_Click(object sender, EventArgs e)
+        {
+            GR_ExportFileConfiguration.PrepareFrom("relatedItems");
+
+            if (GR_ExportFileConfiguration.ShowDialog() != DialogResult.OK) return;
+
+            var fields = GR_ExportFileConfiguration.Fields;
+            var where = GR_ExportFileConfiguration.Where;
+            var format = GR_ExportFileConfiguration.Format;
+            var excludedKeys = GR_ExportFileConfiguration.ExcludedKeys;
+
+            var fodlerSelectionResult = folderBrowserDialog1.ShowDialog();
+            if (fodlerSelectionResult != DialogResult.OK)
+            {
+                return;
+            }
+            var folderPath = folderBrowserDialog1.SelectedPath;
+            var newFileName = $"Export_RelatedItems_{DateTime.UtcNow.ToString("o").Replace(':', '-').Replace('.', '-')}.{format}";
+            var fullFilePath = $"{folderPath}\\{newFileName}";
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                client.RelatedItems.ExportAsync(fullFilePath,
+                    format: format,
+                    where: where,
+                    fields: fields,
+                    excludedKeys: excludedKeys);
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                MessageBox.Show($"File was exported! File name - '{newFileName}' ({fullFilePath})");
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private void RelatedItems_UploadFile_Button_Click(object sender, EventArgs e)
+        {
+            var overwrite = false;
+            var overwriteObject = false;
+            using (var configForm = new GR_ImportFileConfiguration())
+            {
+                if (configForm.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                };
+                overwrite = configForm.Overwrite;
+                overwriteObject = configForm.OverwriteObject;
+            }
+
+            var fodlerSelectionResult = openFileDialog1.ShowDialog();
+            if (fodlerSelectionResult != DialogResult.OK) return;
+
+            var file = openFileDialog1.FileName;
+
+            GenericResource_UploadFile_Result response = null;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+            try
+            {
+                response = client.RelatedItems.BulkUploadFile(file, overwriteObject, overwrite);
+
+                string message = "";
+                if (response.TotalFailed == 0)
+                {
+                    dataGridView1.DataSource = null;
+                    message = "All lines were uploaded successfully!";
+                }
+                else
+                {
+                    message = "NOT all lines were uploaded successfully, some failed. See details in the below table.";
+                    dataGridView1.DataSource = (List<GenericResource_UploadFile_Row>)response.FailedRows;
+                }
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                MessageBox.Show(message + Environment.NewLine
+                    + "Total:  " + response.Total + Environment.NewLine
+                    + "Inserted:  " + response.TotalInserted + Environment.NewLine
+                    + "Updated:  " + response.TotalUpdated + Environment.NewLine
+                    + "Ignored:  " + response.TotalIgnored + Environment.NewLine
+                    + "Merged:  " + response.TotalMergedBeforeUpload + Environment.NewLine
+                    + "Failed:  " + response.TotalFailed);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Upload Related Items Error, message - " + (ex?.Message ?? "No Message"));
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show("Error with importing Related Items Data! Error Message: " + (ex?.Message ?? "No Message"));
+                return;
+            }
+
+        }
+
+        #endregion
+
+        #region Main Resources
+
+        private void MainResource_FindButton_Click(object sender, EventArgs e)
+        {
+            var resource = (string)MainResources_ResourceToUse.SelectedValue;
+            if (!ValidateMainResourceValue(resource)) return;
+
+            GetRequestDataDynamicForm.PrepareFrom(new GetRequestDataDynamicFormPrepareParams()
+            {
+                OpenFor = resource,
+                UseWhereInput = true,
+                UseOrderByInput = true,
+                UseFieldsInput = true,
+
+                UsePageInput = true,
+                UsePageSizeInput = true,
+
+                UseIncludeDeletedCheckBox = true,
+                UseIncludeNestedCheckBox = true,
+                UseFullModeCheckBox = true,
+                UseIsDistinctCheckBox = true
+            });
+            if (GetRequestDataDynamicForm.ShowDialog() != DialogResult.OK) return;
+
+            var pleaseWait = new PleaseWaitForm();
+            pleaseWait.Show();
+            Application.DoEvents();
+
+            try
+            {
+                var fields = GetRequestDataDynamicForm.Fields;
+                var where = GetRequestDataDynamicForm.Where;
+                var orderBy = GetRequestDataDynamicForm.OrderBy;
+
+                var page = GetRequestDataDynamicForm.Page;
+                var pageSize = GetRequestDataDynamicForm.PageSize;
+
+                var includeDeleted = GetRequestDataDynamicForm.IncludeDeleted;
+                var includeNested = GetRequestDataDynamicForm.IncludeDeleted;
+                var fullMode = GetRequestDataDynamicForm.FullMode;
+                var isDistinct = GetRequestDataDynamicForm.IsDistinct;
+
+                object result = null;
+                switch (resource)
+                {
+                    case "items":
+                        result = client.Items.Find(where: where, order_by: orderBy, page: page, page_size: pageSize,
+                                include_nested: includeNested, full_mode: fullMode, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "transactions":
+                        result = client.Transactions.Find(where: where, order_by: orderBy, page: page, page_size: pageSize,
+                                include_nested: includeNested, full_mode: fullMode, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "activities":
+                        result = client.Activities.Find(where: where, order_by: orderBy, page: page, page_size: pageSize,
+                                include_nested: includeNested, full_mode: fullMode, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "accountUsers":
+                        result = client.AccountUsers.Find(where: where, order_by: orderBy, page: page, page_size: pageSize,
+                                include_nested: includeNested, full_mode: fullMode, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "userDefinedTables":
+                        result = client.UserDefinedTables.Find(where: where, order_by: orderBy, page: page, page_size: pageSize,
+                                include_nested: includeNested, full_mode: fullMode, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    default:
+                        pleaseWait.Close();
+                        pleaseWait.ChangeMainLabel();
+                        MessageBox.Show($"Can't find Logic for this Resource!");
+                        return;
+                }
+
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+
+                if (this.MainResource_ShowJsonCheckBox.Checked)
+                {
+                    ShowJson(PrettyJson(result));
+                }
+
+                dataGridView1.DataSource = result;
+            }
+            catch (Exception exc)
+            {
+                pleaseWait.Close();
+                pleaseWait.ChangeMainLabel();
+                MessageBox.Show($"Error! Message - {exc?.Message ?? "No Message"}");
+            }
+        }
+
+        private void MainResource_ExportAsyncButton_Click(object sender, EventArgs e)
+        {
+            var resource = (string)MainResources_ResourceToUse.SelectedValue;
+            if (!ValidateMainResourceValue(resource)) return;
+
+            GetRequestDataDynamicForm.PrepareFrom(new GetRequestDataDynamicFormPrepareParams()
+            {
+                OpenFor = resource,
+                UseWhereInput = true,
+                UseOrderByInput = true,
+                UseFieldsInput = true,
+
+                UsePageInput = false,
+                UsePageSizeInput = false,
+
+                UseIncludeDeletedCheckBox = true,
+                UseIncludeNestedCheckBox = false,
+                UseFullModeCheckBox = false,
+                UseIsDistinctCheckBox = true
+            });
+            if (GetRequestDataDynamicForm.ShowDialog() != DialogResult.OK) return;
 
             var pleaseWait = new PleaseWaitForm();
             pleaseWait.Show();
@@ -565,7 +1087,44 @@ namespace WindowsFormsApp1
             try
             {
                 pleaseWait.ChangeMainLabel("Sending request to export data...");
-                var exportAsyncResponse = ExportAsync(GetExportAsyncRequestDataForm);
+
+                var fields = GetRequestDataDynamicForm.Fields;
+                var where = GetRequestDataDynamicForm.Where;
+                var orderBy = GetRequestDataDynamicForm.OrderBy;
+
+                var includeDeleted = GetRequestDataDynamicForm.IncludeDeleted;
+                var isDistinct = GetRequestDataDynamicForm.IsDistinct;
+
+                ExportAsyncResponse exportAsyncResponse = null;
+                switch (resource)
+                {
+                    case "items":
+                        exportAsyncResponse = client.Items.ExportAsync(where: where, order_by: orderBy, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "transactions":
+                        exportAsyncResponse = client.Transactions.ExportAsync(where: where, order_by: orderBy, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "activities":
+                        exportAsyncResponse = client.Activities.ExportAsync(where: where, order_by: orderBy, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "accountUsers":
+                        exportAsyncResponse = client.AccountUsers.ExportAsync(where: where, order_by: orderBy, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    case "userDefinedTables":
+                        exportAsyncResponse = client.UserDefinedTables.ExportAsync(where: where, order_by: orderBy, include_deleted: includeDeleted,
+                                fields: fields, is_distinct: isDistinct);
+                        break;
+                    default:
+                        pleaseWait.Close();
+                        pleaseWait.ChangeMainLabel();
+                        MessageBox.Show($"Can't find Logic for this Resource!");
+                        return;
+                }
+
                 var jobId = exportAsyncResponse.JobID;
                 pleaseWait.ChangeMainLabel($"Pooling data... Please wait");
 
@@ -584,9 +1143,13 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void udt_BulkUploadButton_Click(object sender, EventArgs e)
+        private void MainResource_BulkUploadButton_Click(object sender, EventArgs e)
         {
-            if (UdtBulkUploadRequestForm.ShowDialog() != DialogResult.OK) return;
+            var resource = (string)MainResources_ResourceToUse.SelectedValue;
+            if (!ValidateMainResourceValue(resource)) return;
+
+            StandardBulkUploadRequestForm.PrepareForm(resource);
+            if (StandardBulkUploadRequestForm.ShowDialog() != DialogResult.OK) return;
 
             var pleaseWait = new PleaseWaitForm();
             pleaseWait.Show();
@@ -594,18 +1157,18 @@ namespace WindowsFormsApp1
 
             try
             {
-                var uploadType = UdtBulkUploadRequestForm.BulkUploadType;
+                var uploadType = StandardBulkUploadRequestForm.BulkUploadType;
 
                 var jobId = "";
 
                 pleaseWait.ChangeMainLabel("Sending Bulk Upload Request...");
                 if (uploadType == eStandardResources_BulkUploadType.Model)
                 {
-                    jobId = udt_BulkUploadButton_UploadModel();
+                    jobId = MainResource_BulkUploadButton_UploadModel(resource);
                 }
                 else if (uploadType == eStandardResources_BulkUploadType.CsvPath)
                 {
-                    jobId = udt_BulkUploadButton_UploadCsv();
+                    jobId = MainResource_BulkUploadButton_UploadCsv(resource);
                 }
                 else
                 {
@@ -630,45 +1193,120 @@ namespace WindowsFormsApp1
             }
         }
 
-        private string udt_BulkUploadButton_UploadModel()
+        private string MainResource_BulkUploadButton_UploadModel(string resource)
         {
-            var overwriteMethod = UdtBulkUploadRequestForm.ModelUpload_OverwriteMethod;
-            var bulkUploadMethod = UdtBulkUploadRequestForm.ModelUpload_BulkUploadMethod;
-            var fieldsToUpload = UdtBulkUploadRequestForm.ModelUpload_FieldsToUpload;
-            var saveZip = UdtBulkUploadRequestForm.ModelUpload_SaveZip;
+            var overwriteMethod = StandardBulkUploadRequestForm.ModelUpload_OverwriteMethod;
+            var bulkUploadMethod = StandardBulkUploadRequestForm.ModelUpload_BulkUploadMethod;
+            var fieldsToUpload = StandardBulkUploadRequestForm.ModelUpload_FieldsToUpload;
+            var saveZip = StandardBulkUploadRequestForm.ModelUpload_SaveZip;
 
-            var jsonData = UdtBulkUploadRequestForm.ParseUploadModelData<UserDefinedTable>();
+            var jsonData = StandardBulkUploadRequestForm.ParseUploadModelData<object>();
 
-            var bulkUploadResult = client.UserDefinedTables.BulkUpload(jsonData, overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+            BulkUploadResponse bulkUploadResult = null;
+
+            switch (resource)
+            {
+                case "items":
+                    bulkUploadResult = client.Items.BulkUpload(StandardBulkUploadRequestForm.ParseUploadModelData<Item>(),
+                        overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+                    break;
+                //case "transactions":
+                //    bulkUploadResult = client.Transactions.BulkUpload(StandardBulkUploadRequestForm.ParseUploadModelData<Transaction>(), 
+                //        overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+                //    break;
+                //case "activities":
+                //    bulkUploadResult = client.Activities.BulkUpload(StandardBulkUploadRequestForm.ParseUploadModelData<Activity>(), 
+                //        overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+                //    break;
+                case "accountUsers":
+                    bulkUploadResult = client.AccountUsers.BulkUpload(StandardBulkUploadRequestForm.ParseUploadModelData<AccountUser>(),
+                        overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+                    break;
+                case "userDefinedTables":
+                    bulkUploadResult = client.UserDefinedTables.BulkUpload(StandardBulkUploadRequestForm.ParseUploadModelData<UserDefinedTable>(),
+                        overwriteMethod, bulkUploadMethod, fieldsToUpload, saveZip);
+                    break;
+                default:
+                    throw new Exception($"Logic For this Resource (\"{resource}\") is not available!");
+            }
 
             return bulkUploadResult.JobID;
         }
 
-        private string udt_BulkUploadButton_UploadCsv()
+        private string MainResource_BulkUploadButton_UploadCsv(string resource)
         {
-            var overwriteMethod = UdtBulkUploadRequestForm.CsvUpload_OverwriteMethod;
-            var filePath = UdtBulkUploadRequestForm.CsvUpload_FilePath;
-            var zipFilePath = UdtBulkUploadRequestForm.CsvUpload_FilePathToStoreZipFile;
-            var encoding = UdtBulkUploadRequestForm.CsvUpload_FileEncoding;
+            var overwriteMethod = StandardBulkUploadRequestForm.CsvUpload_OverwriteMethod;
+            var filePath = StandardBulkUploadRequestForm.CsvUpload_FilePath;
+            var zipFilePath = StandardBulkUploadRequestForm.CsvUpload_FilePathToStoreZipFile;
+            var encoding = StandardBulkUploadRequestForm.CsvUpload_FileEncoding;
 
-            var bulkUploadResult = client.UserDefinedTables.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+            BulkUploadResponse bulkUploadResult = null;
+
+            switch (resource)
+            {
+                case "items":
+                    bulkUploadResult = client.Items.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+                    break;
+                //case "transactions":
+                //    bulkUploadResult = client.Transactions.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+                //    break;
+                //case "activities":
+                //    bulkUploadResult = client.Activities.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+                //    break;
+                case "accountUsers":
+                    bulkUploadResult = client.AccountUsers.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+                    break;
+                case "userDefinedTables":
+                    bulkUploadResult = client.UserDefinedTables.BulkUpload(filePath, overwriteMethod, encoding, FilePathToStoreZipFile: zipFilePath);
+                    break;
+                default:
+                    throw new Exception($"Logic For this Resource (\"{resource}\") is not available!");
+            }
 
             return bulkUploadResult.JobID;
         }
-
 
         #endregion
 
+        #region Generic
 
-        private ExportAsyncResponse ExportAsync(GetExportAsyncRequestDataForm form)
+        private List<DropdownItem> GenerateMainResoourcesDropDownList()
         {
-            return client.UserDefinedTables.ExportAsync(form.Where, form.OrderBy, form.IncludeDeleted, form.Fields, form.IsDistinct);
+            return new List<DropdownItem>() {
+                new DropdownItem("items", "Items"),
+                //new DropdownItem("transactions", "Transactions"),
+                //new DropdownItem("activities", "Activities"),
+                new DropdownItem("accountUsers", "Account Users"),
+                new DropdownItem("userDefinedTables", "User Defined Tables")
+            };
         }
 
-        private string PrettyJson<TObject>(TObject data)
+        private bool ValidateMainResourceValue(string mainResource)
+        {
+            var found = GenerateMainResoourcesDropDownList().FirstOrDefault(item => item.Value == mainResource);
+            if (found == null)
+            {
+                MessageBox.Show($"Incorrect Main Resource Value!");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static string PrettyJson<TObject>(TObject data)
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(data,
                                     Newtonsoft.Json.Formatting.Indented,
+                                    new Newtonsoft.Json.JsonSerializerSettings
+                                    {
+                                        NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
+                                        DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc //will serialize date time as utc
+                                    });
+        }
+
+        public static TObject ParseJson<TObject>(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<TObject>(data,
                                     new Newtonsoft.Json.JsonSerializerSettings
                                     {
                                         NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
@@ -681,6 +1319,16 @@ namespace WindowsFormsApp1
             GenericJsonResponseForm.SetText(json);
             GenericJsonResponseForm.ShowDialog();
         }
+
+
+
+
+
+
+
+
+        #endregion
+
     }
 
 

@@ -71,7 +71,7 @@ namespace Pepperi.SDK.Helpers
         {
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath, true))
             {
-                file.Write(s); ;
+                file.Write(s);
             }
         }
 

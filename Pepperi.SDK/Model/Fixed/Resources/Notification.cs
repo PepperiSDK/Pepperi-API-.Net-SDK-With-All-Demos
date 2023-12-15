@@ -15,7 +15,7 @@ namespace Pepperi.SDK.Model.Fixed.Resources
         public bool? Hidden { get; set; }
         public bool? Read { get; set; } // false by default
         public string CreatorUUID { get; set; } // read-only, auto-generate
-        public string CreatorName { get; set; } // read-only, auto-generate 
+        public string CreatorName { get; set; } // read-only, auto-generate ?
 
         public string Body { get; set; }
         public string Title { get; set; }

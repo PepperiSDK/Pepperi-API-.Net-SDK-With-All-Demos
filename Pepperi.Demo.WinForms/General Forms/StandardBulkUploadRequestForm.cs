@@ -19,6 +19,7 @@ namespace WinFormApiDemo.General_Forms
         public eStandardResources_BulkUploadType BulkUploadType { get; set; }
         public bool FormWasLoaded { get; set; } = false;
         public EncodingInfo DefaultEncodingInfo { get; set; }
+        public string LastOpenedFor { get; set; }
 
         #region Model Upload
 
@@ -44,6 +45,21 @@ namespace WinFormApiDemo.General_Forms
             InitializeComponent();
         }
 
+        public void PrepareForm(string openFor)
+        {
+            if (LastOpenedFor != openFor)
+            {
+                ResetInputsToDefault();
+                LastOpenedFor = openFor;
+            }
+        }
+
+        private void ResetInputsToDefault()
+        {
+            Clear_ModelUpload();
+            Clear_CsvUpload();
+        }
+
         private void StandardBulkUploadRequestForm_Load(object sender, EventArgs e)
         {
             if (modelUpload_OverwriteMethod_ComboBox.SelectedItem == null)
@@ -54,7 +70,8 @@ namespace WinFormApiDemo.General_Forms
             if (csvUpload_OverwriteMethod_ComboBox.SelectedItem == null)
                 csvUpload_OverwriteMethod_ComboBox.SelectedItem = "none";
 
-            if (!FormWasLoaded) {
+            if (!FormWasLoaded)
+            {
                 var encodings = Encoding.GetEncodings();
                 var encodingsList = new List<EncodingInfo>() { };
                 for (int i = 0; i < encodings.Length; i++)
@@ -107,7 +124,8 @@ namespace WinFormApiDemo.General_Forms
                 {
                     parsed = ParseUploadModelData<object>();
                 }
-                catch (Exception) {
+                catch (Exception)
+                {
                     Validate(false, "Can't parse JSON Model! Should be not empty JSON Array of Objects ([{...}, {...}])");
                 }
                 Validate(parsed != null && parsed.Count() > 0, "Parsed Array is empty! Should be not empty JSON Array of Objects ([{...}, {...}])");
@@ -119,16 +137,19 @@ namespace WinFormApiDemo.General_Forms
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
                 this.Close();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 MessageBox.Show(ex?.Message ?? "No Message");
             }
         }
 
-        public IEnumerable<TData> ParseUploadModelData<TData>() {
+        public IEnumerable<TData> ParseUploadModelData<TData>()
+        {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<TData>>(this.ModelUpload_JsonData);
         }
 
-        private void Validate(string value, string message) {
+        private void Validate(string value, string message)
+        {
             if (string.IsNullOrEmpty(value)) throw new Exception(message);
         }
 
@@ -144,13 +165,7 @@ namespace WinFormApiDemo.General_Forms
 
         private void modelUpload_Clear_Button_Click(object sender, EventArgs e)
         {
-            modelUpload_OverwriteMethod_ComboBox.SelectedItem = "none";
-            modelUpload_UploadMethod_ComboBox.SelectedItem = "Json";
-
-            modelUpload_SaveZip_CheckBox.Checked = false;
-
-            this.modelUpload_FieldsToUpload_TextBox.Text = "";
-            this.jsonDataTextBox.Text = "";
+            Clear_ModelUpload();
         }
 
         private void csvUpload_SelectFile_Button_Click(object sender, EventArgs e)
@@ -197,10 +212,15 @@ namespace WinFormApiDemo.General_Forms
             {
                 MessageBox.Show(ex?.Message ?? "No Message");
             }
-            
+
         }
 
         private void csvUpload_Clear_Button_Click(object sender, EventArgs e)
+        {
+            Clear_CsvUpload();
+        }
+
+        private void Clear_CsvUpload()
         {
             csvUpload_OverwriteMethod_ComboBox.SelectedItem = "none";
 
@@ -208,6 +228,17 @@ namespace WinFormApiDemo.General_Forms
             this.csvUpload_FilePathToStoreZipFile_TextBox.Text = "";
 
             csvUpload_FileEncoding_ComboBox.SelectedItem = this.DefaultEncodingInfo;
+        }
+
+        private void Clear_ModelUpload()
+        {
+            modelUpload_OverwriteMethod_ComboBox.SelectedItem = "none";
+            modelUpload_UploadMethod_ComboBox.SelectedItem = "Json";
+
+            modelUpload_SaveZip_CheckBox.Checked = false;
+
+            this.modelUpload_FieldsToUpload_TextBox.Text = "";
+            this.jsonDataTextBox.Text = "";
         }
     }
 }

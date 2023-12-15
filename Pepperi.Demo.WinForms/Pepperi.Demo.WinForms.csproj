@@ -59,11 +59,41 @@
     <Compile Include="General Forms\GenericJsonResponseForm.Designer.cs">
       <DependentUpon>GenericJsonResponseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="General Forms\GenericResourcesForms\GR_ExportFileConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GenericResourcesForms\GR_ExportFileConfiguration.Designer.cs">
+      <DependentUpon>GR_ExportFileConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="General Forms\GenericResourcesForms\GR_ImportFileConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GenericResourcesForms\GR_ImportFileConfiguration.Designer.cs">
+      <DependentUpon>GR_ImportFileConfiguration.cs</DependentUpon>
+    </Compile>
     <Compile Include="General Forms\GetExportAsyncRequestDataForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="General Forms\GetExportAsyncRequestDataForm.Designer.cs">
       <DependentUpon>GetExportAsyncRequestDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="General Forms\GetJsonToUseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GetJsonToUseForm.Designer.cs">
+      <DependentUpon>GetJsonToUseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="General Forms\GetKeyGenericForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GetKeyGenericForm.Designer.cs">
+      <DependentUpon>GetKeyGenericForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="General Forms\GetRequestDataDynamicForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GetRequestDataDynamicForm.Designer.cs">
+      <DependentUpon>GetRequestDataDynamicForm.cs</DependentUpon>
     </Compile>
     <Compile Include="General Forms\GetRequestDataForm.cs">
       <SubType>Form</SubType>
@@ -84,6 +114,7 @@
       <DependentUpon>StandardBulkUploadRequestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\JsonParser.cs" />
+    <Compile Include="Helpers\ValuesValidator.cs" />
     <Compile Include="Ipaas Forms\GetIpaasStartScheduledJobInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,6 +128,13 @@
       <DependentUpon>IpaasRunJobResultForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\Enums.cs" />
+    <Compile Include="Model\Generic.cs" />
+    <Compile Include="PepperiResoursesForms\Journeys\JourneysSearchFilesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PepperiResoursesForms\Journeys\JourneysSearchFilesForm.Designer.cs">
+      <DependentUpon>JourneysSearchFilesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Surveys Forms\surveysResponseForm.cs">
@@ -132,6 +170,21 @@
     <EmbeddedResource Include="frmSample.resx">
       <DependentUpon>frmSample.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\GenericResourcesForms\GR_ExportFileConfiguration.resx">
+      <DependentUpon>GR_ExportFileConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\GenericResourcesForms\GR_ImportFileConfiguration.resx">
+      <DependentUpon>GR_ImportFileConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\GetJsonToUseForm.resx">
+      <DependentUpon>GetJsonToUseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\GetKeyGenericForm.resx">
+      <DependentUpon>GetKeyGenericForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\GetRequestDataDynamicForm.resx">
+      <DependentUpon>GetRequestDataDynamicForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="General Forms\GetRequestDataForm.resx">
       <DependentUpon>GetRequestDataForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -143,6 +196,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Ipaas Forms\IpaasRunJobResultForm.resx">
       <DependentUpon>IpaasRunJobResultForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PepperiResoursesForms\Journeys\JourneysSearchFilesForm.resx">
+      <DependentUpon>JourneysSearchFilesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

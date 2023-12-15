@@ -16,40 +16,42 @@ using Newtonsoft.Json;
 
 namespace Pepperi.SDK.Endpoints.Base
 {
-    public class BaseEndpoint_For_UserDefinedCollections
+    internal class BaseEndpoint_For_GenericResources<TModel>
     {
-        #region properties
+        #region Properties
 
+        private string ResourceName { get; set; }
         private string ApiBaseUri { get; set; }
         private string IpaasBaseUri { get; set; }
         private AuthentificationManager AuthentificationManager { get; set; }
         private ILogger Logger { get; set; }
 
         private AuditLogsEndpoint AuditLogs { get; set; }
+
         #endregion
 
         #region constructor
 
-        protected BaseEndpoint_For_UserDefinedCollections(AuthentificationManager AuthentificationManager, ILogger Logger,
-            string papiBaseUri = null, string ipaasBaseUrl = null)
+        internal BaseEndpoint_For_GenericResources(string resourceName, AuthentificationManager AuthentificationManager, ILogger Logger, 
+            string papiBaseUri = null, string ipaasBaseUrl = null, AuditLogsEndpoint auditLogs = null)
         {
+            this.ResourceName = resourceName;
             this.ApiBaseUri = papiBaseUri;
             this.IpaasBaseUri = ipaasBaseUrl;
             this.AuthentificationManager = AuthentificationManager;
             this.Logger = Logger;
 
-            this.AuditLogs = new AuditLogsEndpoint(ApiBaseUri, AuthentificationManager?.PepperiApiAuth, Logger);
+            this.AuditLogs = auditLogs ?? new AuditLogsEndpoint(ApiBaseUri, AuthentificationManager?.PepperiApiAuth, Logger);
         }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
-
-        #region CRUD Operations
-        public TModel Upsert<TModel>(string collectionName, TModel Model)
+        internal TModel Upsert(TModel Model)
         {
-            string RequestUri = $"resources/{collectionName}";
+            ValuesValidator.Validate(this.ResourceName, "Resource Name is empty!");
+            string RequestUri = $"resources/{this.ResourceName}";
 
             Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
 
@@ -81,15 +83,14 @@ namespace Pepperi.SDK.Endpoints.Base
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public IEnumerable<UDC_ImportData_Response> ImportData<TData>(string schemeName, IEnumerable<TData> data, bool? overwriteObject = null)
+        internal IEnumerable<GenericResource_ImportData_Response> ImportData(IEnumerable<TModel> data, bool? overwriteObject = null)
         {
-
-            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
+            ValuesValidator.Validate(this.ResourceName, "Resource Name is empty!");
             ValuesValidator.Validate(data, "Scheme Name is empty!");
 
-            var subUrl = $"resources/{schemeName}/import/data";
+            var subUrl = $"resources/{this.ResourceName}/import/data";
 
-            var requestData = new UDC_ImportData_Request<TData>()
+            var requestData = new GenericResource_ImportData_Request<TModel>()
             {
                 Objects = data,
                 OverwriteObject = overwriteObject
@@ -97,80 +98,62 @@ namespace Pepperi.SDK.Endpoints.Base
             var body = PepperiJsonSerializer.Serialize(requestData);
             var response = PostPepperiApi(subUrl, body);
 
-            return PepperiJsonSerializer.DeserializeCollection<UDC_ImportData_Response>(response.Body);
+            return PepperiJsonSerializer.DeserializeCollection<GenericResource_ImportData_Response>(response.Body);
         }
 
-        public IEnumerable<TModel> Find<TModel>(string collectionName,
-            string where = null, string fields = null, string order_by = null, int? page = null, int? page_size = null)
+        internal IEnumerable<TModel> Find(string where = null, string fields = null, string order_by = null, int? page = null, int? page_size = null)
         {
-            PepperiHttpClientResponse PepperiHttpClientResponse = Find(collectionName, where, fields, order_by, page, page_size);
+            PepperiHttpClientResponse PepperiHttpClientResponse = FindWithResponse(where, fields, order_by, page, page_size);
 
             IEnumerable<TModel> result = PepperiJsonSerializer.DeserializeCollection<TModel>(PepperiHttpClientResponse.Body);
             return result;
         }
 
-        public TModel FindByKey<TModel>(string schemeName, string key)
+        internal TModel FindByKey(string key)
         {
-            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
+            ValuesValidator.Validate(this.ResourceName, "Resource Name is empty!");
             ValuesValidator.Validate(key, "Key is empty!");
 
-            var subUrl = $"resources/{schemeName}/key/{key}";
+            var subUrl = $"resources/{this.ResourceName}/key/{key}";
             var response = GetPepperiApi(subUrl);
 
             var result = PepperiJsonSerializer.DeserializeOne<TModel>(response.Body);
             return result;
         }
 
-        public JArray FindGeneric(string collectionName,
-            string where = null, string fields = null, string order_by = null, int? page = null, int? page_size = null)
+        internal JArray FindGeneric(string where = null, string fields = null, string order_by = null, int? page = null, int? page_size = null)
         {
-            PepperiHttpClientResponse PepperiHttpClientResponse = Find(collectionName, where, fields, order_by, page, page_size);
+            PepperiHttpClientResponse PepperiHttpClientResponse = FindWithResponse(where, fields, order_by, page, page_size);
             JsonReader reader = new JsonTextReader(new StringReader(PepperiHttpClientResponse.Body));
             reader.DateParseHandling = DateParseHandling.None;
             JArray obj = JArray.Load(reader);
             return obj;
         }
 
-        public bool Delete(string schemeName, string key)
-        {
-            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
-            ValuesValidator.Validate(key, "Key is empty!");
-
-            var subUrl = $"resources/{schemeName}";
-
-            var body = PepperiJsonSerializer.Serialize(new UDC_Base_Row()
-            {
-                Hidden = true,
-                Key = key
-            });
-            var response = PostPepperiApi(subUrl, body);
-
-            return PepperiJsonSerializer.DeserializeOne<UDC_Base_Row>(response.Body)?.Hidden == true;
-        }
-
-        #endregion
-
-        public UDC_UploadFile_Result BulkUploadFile(string schemeName, string filePath, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
+        internal GenericResource_UploadFile_Result BulkUploadFile(string filePath, bool? overwriteObject = null, bool? overwriteTable = null,
+            int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
             var fileExtention = GetValidatedFileExtention(filePath);
             var fileData = ReadFileByteArray(filePath);
 
-            return BulkUploadFile(schemeName, fileData, fileExtention, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
+            return BulkUploadFile(fileData, fileExtention, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
         }
 
-        public UDC_UploadFile_Result BulkUploadViaFileApi<TData>(string schemeName, IEnumerable<TData> data, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
+        internal GenericResource_UploadFile_Result BulkUploadViaFileApi<TData>(IEnumerable<TData> data, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
             var jsonData = PepperiJsonSerializer.Serialize(data);
-            return BulkUploadViaFileApi(schemeName, jsonData, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
+            return BulkUploadViaFileApi(jsonData, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
         }
 
-        public UDC_UploadFile_Result BulkUploadViaFileApi(string schemeName, string jsonData, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
+        internal GenericResource_UploadFile_Result BulkUploadViaFileApi(string jsonData, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
             var byteData = Encoding.UTF8.GetBytes(jsonData);
-            return BulkUploadFile(schemeName, byteData, ".json", overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
+            return BulkUploadFile(byteData, ".json", overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
         }
 
-        public void ExportAsync(string schemeName, string filePath, string format = null, string where = null, string fields = null, string delimiter = null, IEnumerable<string> excludedKeys = null)
+        internal void ExportAsync(string filePath, string format = null, string where = null, string fields = null,
+            string delimiter = null, IEnumerable<string> excludedKeys = null,
+            int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
             ValuesValidator.Validate(filePath, "File Path is empty!");
             var parent = Directory.GetParent(filePath);
@@ -178,10 +161,17 @@ namespace Pepperi.SDK.Endpoints.Base
             var fileExtension = Path.GetExtension(filePath);
             ValuesValidator.Validate(fileExtension == ".json" || fileExtension == ".csv", "Incorrect file extension! (Should be .json or .csv)");
 
-            var fileUrl = ExportFile(schemeName, format, where, fields, delimiter, excludedKeys);
+            var fileUrl = ExportFile(format, where, fields, delimiter, excludedKeys, poolingInternvalInMs: poolingInternvalInMs, numberOfPoolingAttempts: numberOfPoolingAttempts);
+
+            this.Logger.Log($"Result File Url: {fileUrl ?? "No URL"}");
+
+            this.Logger.Log($"Retrieving file...");
             var response = GetRequestByteArrayBody(fileUrl);
 
+            this.Logger.Log($"Saving file...");
             File.WriteAllBytes(filePath, response);
+
+            this.Logger.Log($"File was saved!" + Environment.NewLine + Environment.NewLine);
             return;
         }
 
@@ -189,85 +179,32 @@ namespace Pepperi.SDK.Endpoints.Base
 
         #region Private Methods
 
-        public UDC_UploadFile_Result BulkUploadFile(string schemeName, byte[] data, string fileExtention, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
-        {
-            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
 
+        internal GenericResource_UploadFile_Result BulkUploadFile(byte[] data, string fileExtention, bool? overwriteObject = null, bool? overwriteTable = null,
+             int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
+        {
+            ValuesValidator.Validate(this.ResourceName, "Resource Name is empty!");
+
+            this.Logger.Log("Starting Data Import..." + Environment.NewLine + Environment.NewLine);
             var contentType = MapFileExtentionToContentType(fileExtention);
             var key = Guid.NewGuid().ToString();
+
+            this.Logger.Log("Generated AWS Key - " + key);
             var presignedUrlToPut = GetPresignedUrl(key, contentType);
+            this.Logger.Log("Starting to upload data to AWS with generated url - " + presignedUrlToPut);
 
             var statusCode = UploadDataToAws(presignedUrlToPut, data, contentType);
+            this.Logger.Log("Data was uploaded to AWS with Status Code - " + statusCode);
             ValuesValidator.Validate(statusCode == HttpStatusCode.OK, "Can't upload data to AWS!");
 
             var ipaasUrlToGetFile = GetIpaasUrl($"Aws/GetAwsData?key={key}&ClientToken={this.AuthentificationManager.IdpAuth.APIToken}&contentType={contentType}&extention={fileExtention}");
-            var importFileResponse = ImportFileToPepperi(schemeName, ipaasUrlToGetFile, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
+            this.Logger.Log("Generated IPAAS URL - " + ipaasUrlToGetFile + Environment.NewLine + Environment.NewLine);
+
+            this.Logger.Log("Starting importing process...");
+            var importFileResponse = ImportFileToPepperi(ipaasUrlToGetFile, overwriteObject, overwriteTable, poolingInternvalInMs, numberOfPoolingAttempts);
+
+            this.Logger.Log("Retrieving importing result Data...");
             var result = GetImportFileDataResult(importFileResponse);
-            return result;
-        }
-
-        private bool DeleteSchemeData(string schemeName, byte[] data = null, string fileExtention = null, string filePath = null)
-        {
-            var schemeMeta = GetUserDefinedCollection(schemeName);
-
-            var schemeMandatoryFields = schemeMeta?.Fields.Where(field => field.Value?.Mandatory == true).Select(field => field.Key).ToList();
-            schemeMandatoryFields.Insert(0, "Key"); // Key is required
-            var schemeMandatoryFieldsString = string.Join(",", schemeMandatoryFields);
-
-            var schemeData = GetAllSchemeDataForOverwrite<IDictionary<string, object>>(schemeName, schemeMandatoryFieldsString);
-
-            if (schemeData.Count() == 0)
-            {
-                return true;
-            }
-
-            schemeData = ExcludeKeys(schemeData, data, fileExtention, schemeMeta, filePath);
-
-            if (schemeData.Count() == 0)
-            {
-                return true;
-            }
-            foreach (var item in schemeData)
-            {
-                if (item.ContainsKey("Hidden"))
-                {
-                    item["Hidden"] = true;
-                }
-                else
-                {
-                    item.Add("Hidden", true);
-                }
-
-            }
-
-            var uploadedResponse = BulkUploadViaFileApi(schemeName, schemeData, true, false);
-
-            return uploadedResponse.Total == schemeData.Count() && uploadedResponse.TotalFailed == 0;
-        }
-
-        private IEnumerable<IDictionary<string, object>> ExcludeKeys(IEnumerable<IDictionary<string, object>> schemeData, byte[] data, string fileExtention, UDC_MetaData schemeMeta, string filePath = null)
-        {
-            var result = schemeData;
-            if (fileExtention == ".json")
-            {
-                if (schemeMeta?.DocumentKey?.Type == "Composite")
-                {
-                    var fields = schemeMeta?.DocumentKey?.Fields;
-                    var parsedKeys = PepperiJsonSerializer.DeserializeCollection<IDictionary<string, object>>(
-                        System.Text.Encoding.UTF8.GetString(data, 0, data.Length)
-                        )
-                        .Select(row => GenerateKey(row, fields))
-                        .ToList();
-                    result = schemeData.Where(row => !parsedKeys.Contains((string)row["Key"])).ToList();
-                }
-            }
-            else if (fileExtention == ".csv")
-            {
-                //using (var parser = new GenericParser(filePath))
-                //{
-
-                //}
-            }
             return result;
         }
 
@@ -281,13 +218,18 @@ namespace Pepperi.SDK.Endpoints.Base
             return key;
         }
 
-        private string ExportFile(string schemeName, string format = null, string where = null,
-            string fields = null, string delimiter = null, IEnumerable<string> excludedKeys = null)
+        private string ExportFile(string format = null, string where = null,
+            string fields = null, string delimiter = null, IEnumerable<string> excludedKeys = null,
+            int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
 
-            var exportFileResponse = SendExportFileRequest(schemeName, format, where, fields, delimiter, excludedKeys);
+            this.Logger.Log("Starting to Export File..." + Environment.NewLine + Environment.NewLine);
+            var exportFileResponse = SendExportFileRequest(format, where, fields, delimiter, excludedKeys);
+            this.Logger.Log("Retrieved Audit Log ID: " + (exportFileResponse?.ExecutionUUID ?? "No Log ID") + Environment.NewLine + Environment.NewLine);
             var auditLogId = exportFileResponse.ExecutionUUID;
-            var finalAuditLog = this.AuditLogs.AuditLogPolling(auditLogId);
+            var finalAuditLog = this.AuditLogs.AuditLogPolling(auditLogId,
+                poolingInternvalInMs: poolingInternvalInMs,
+                numberOfPoolingAttempts: numberOfPoolingAttempts);
 
             this.AuditLogs.ValidateSuccessAuditLog(finalAuditLog, "Export File");
 
@@ -302,26 +244,20 @@ namespace Pepperi.SDK.Endpoints.Base
             return resultUri;
         }
 
-        private IEnumerable<TData> GetAllSchemeDataForOverwrite<TData>(string schemeName, string fields = null)
-        {
-            var responseData = ExportAsync<TData>(schemeName, fields: fields);
-            return responseData;
-        }
-
         /// <summary>
         /// Only for json format
         /// </summary>
-        private IEnumerable<TData> ExportAsync<TData>(string schemeName, string where = null, string fields = null, string delimiter = null, IEnumerable<string> excludedKeys = null)
+        private IEnumerable<TData> ExportAsync<TData>(string where = null, string fields = null, string delimiter = null, IEnumerable<string> excludedKeys = null)
         {
-            var fileUrl = ExportFile(schemeName, "json", where, fields, delimiter, excludedKeys);
+            var fileUrl = ExportFile("json", where, fields, delimiter, excludedKeys);
             var response = GetRequestBody(fileUrl);
             return PepperiJsonSerializer.DeserializeCollection<TData>(response);
         }
 
-        private PepperiHttpClientResponse Find(string schemeName, string where = null, string fields = null, string order_by = null, int? page = null, int? page_size = null)
+        private PepperiHttpClientResponse FindWithResponse(string where = null, string fields = null, string order_by = null, int? page = null, int? page_size = null)
 
         {
-            string RequestUri = $"resources/{schemeName}";
+            string RequestUri = $"resources/{this.ResourceName}";
 
             Dictionary<string, string> dicQueryStringParameters = new Dictionary<string, string>();
             if (where != null) { dicQueryStringParameters.Add("where", where); }
@@ -390,10 +326,7 @@ namespace Pepperi.SDK.Endpoints.Base
         }
         private HttpStatusCode UploadDataToAws(string url, byte[] data, string contentType = "application/json")
         {
-            var HttpClient = new HttpClient(new LoggingHandler(this.Logger))
-            {
-
-            };
+            var HttpClient = new HttpClient(new LoggingHandler(this.Logger));
 
             //send request
             HttpClient.Timeout = new TimeSpan(0, 5, 0);// by default wait 5 minutes
@@ -404,22 +337,25 @@ namespace Pepperi.SDK.Endpoints.Base
             return HttpResponseMessage.StatusCode;
         }
 
-        private PepperiAuditLog ImportFileToPepperi(string schemeName, string fileUrl, bool? overwriteObject = null, bool? overwriteTable = null, int poolingInternvalInMs = 5000, int numberOfPoolingAttempts = 500)
+        private PepperiAuditLog ImportFileToPepperi(string fileUrl, bool? overwriteObject = null, bool? overwriteTable = null,
+             int poolingInternvalInMs = 1000, int numberOfPoolingAttempts = 60 * 5)
         {
-            var importFileResponse = SendImportFileToPepperiRequest(schemeName, fileUrl, overwriteObject, overwriteTable);
+            var importFileResponse = SendImportFileToPepperiRequest(fileUrl, overwriteObject, overwriteTable);
             var auditLogId = importFileResponse.ExecutionUUID;
+            this.Logger.Log("Retrieved Audit Log ID: " + (auditLogId ?? "No Log ID") + Environment.NewLine + Environment.NewLine);
             var finalAuditLog = this.AuditLogs.AuditLogPolling(auditLogId, poolingInternvalInMs, numberOfPoolingAttempts);
 
             this.AuditLogs.ValidateSuccessAuditLog(finalAuditLog, "Import file");
+
             return finalAuditLog;
         }
 
-        private PepperiResponseForAuditLog SendImportFileToPepperiRequest(string schemeName, string fileUrl, bool? overwriteObject = null, bool? overwriteTable = null)
+        private PepperiResponseForAuditLog SendImportFileToPepperiRequest(string fileUrl, bool? overwriteObject = null, bool? overwriteTable = null)
         {
-            var RequestUri = $"resources/{HttpUtility.UrlEncode(schemeName)}/import/file";
+            var RequestUri = $"resources/{HttpUtility.UrlEncode(this.ResourceName)}/import/file";
             PepperiHttpClient PepperiHttpClient = new PepperiHttpClient(this.AuthentificationManager.IdpAuth, this.Logger);
 
-            string postBody = PepperiJsonSerializer.Serialize(new UDC_UploadFile_Request()
+            string postBody = PepperiJsonSerializer.Serialize(new GenericResource_UploadFile_Request()
             {
                 URI = fileUrl,
                 OverwriteObject = overwriteObject,
@@ -428,6 +364,7 @@ namespace Pepperi.SDK.Endpoints.Base
             string contentType = "application/json";
             string accept = "application/json";
 
+            Logger.Log($"Sending Import File Request...{Environment.NewLine}URL - {ApiBaseUri + RequestUri}{Environment.NewLine}Body - {postBody}");
             PepperiHttpClientResponse PepperiHttpClientResponse = PepperiHttpClient.PostStringContent(
                     ApiBaseUri,
                     RequestUri,
@@ -442,10 +379,6 @@ namespace Pepperi.SDK.Endpoints.Base
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// User Defined Collection Name / Scheme Name
-        /// <param name="schemeName"></param>
         /// 
         /// output format. either json or csv. defaults to json.
         /// <param name="format"></param>
@@ -468,12 +401,11 @@ namespace Pepperi.SDK.Endpoints.Base
         /// <param name="excludedKeys"></param>
         /// 
         /// <returns></returns>
-        private PepperiResponseForAuditLog SendExportFileRequest(string schemeName,
-            string format = null, string where = null,
+        private PepperiResponseForAuditLog SendExportFileRequest(string format = null, string where = null,
             string fields = null, string delimiter = null, IEnumerable<string> excludedKeys = null)
         {
 
-            var requestUri = $"resources/{HttpUtility.UrlEncode(schemeName)}/export/file";
+            var requestUri = $"resources/{HttpUtility.UrlEncode(this.ResourceName)}/export/file";
             PepperiHttpClient PepperiHttpClient = new PepperiHttpClient(this.AuthentificationManager.IdpAuth, this.Logger);
 
             string postBody = PepperiJsonSerializer.Serialize(new UDC_ExportFile_Request()
@@ -487,6 +419,7 @@ namespace Pepperi.SDK.Endpoints.Base
             string contentType = "application/json";
             string accept = "application/json";
 
+            Logger.Log($"Sending Export File Request...\nURL - {ApiBaseUri + requestUri}\nBody - {postBody}");
             PepperiHttpClientResponse PepperiHttpClientResponse = PepperiHttpClient.PostStringContent(
                     ApiBaseUri,
                     requestUri,
@@ -500,25 +433,17 @@ namespace Pepperi.SDK.Endpoints.Base
             return PepperiJsonSerializer.DeserializeOne<PepperiResponseForAuditLog>(PepperiHttpClientResponse.Body);
         }
 
-        private UDC_MetaData GetUserDefinedCollection(string schemeName)
-        {
-            ValuesValidator.Validate(schemeName, "Scheme Name is empty!");
-
-            var requestUri = $"user_defined_collections/schemes/{schemeName}";
-            var response = GetPepperiApi(requestUri);
-
-            return PepperiJsonSerializer.DeserializeOne<UDC_MetaData>(response.Body);
-        }
-
-        private UDC_UploadFile_Result GetImportFileDataResult(PepperiAuditLog auditLog)
+        private GenericResource_UploadFile_Result GetImportFileDataResult(PepperiAuditLog auditLog)
         {
             var logResultObject = auditLog?.AuditInfo?.ResultObject;
             ValuesValidator.Validate(logResultObject, $"Import File: Can't get Audit Log Result Object!", false);
 
-            var parsedResultObject = PepperiJsonSerializer.DeserializeOne<UDC_UploadFile_AuditLog_ResultObject>(logResultObject);
+            var parsedResultObject = PepperiJsonSerializer.DeserializeOne<GenericResource_UploadFile_AuditLog_ResultObject>(logResultObject);
             var url = parsedResultObject?.URI;
 
             ValuesValidator.Validate(url, $"Can't get URI Response! Response Error Message: {parsedResultObject?.ErrorMessage ?? "No Message"}");
+
+            Logger.Log($"URL with upload result data - {url}");
 
             var HttpClient = new HttpClient(new LoggingHandler(this.Logger)) { };
 
@@ -529,16 +454,16 @@ namespace Pepperi.SDK.Endpoints.Base
 
             ValuesValidator.Validate(HttpResponseMessage.StatusCode == HttpStatusCode.OK, $"Can't get Required File! (Status Code - {HttpResponseMessage.StatusCode})");
 
-            var table = PepperiJsonSerializer.DeserializeCollection<UDC_UploadFile_Row>(body);
+            var table = PepperiJsonSerializer.DeserializeCollection<GenericResource_UploadFile_Row>(body);
 
-            var result = new UDC_UploadFile_Result()
+            var result = new GenericResource_UploadFile_Result()
             {
                 Total = table.Count(),
                 TotalUpdated = 0,
                 TotalIgnored = 0,
                 TotalFailed = 0,
                 TotalMergedBeforeUpload = 0,
-                FailedRows = new List<UDC_UploadFile_Row>() { }
+                FailedRows = new List<GenericResource_UploadFile_Row>() { }
             };
 
             var grouped = table.GroupBy(row => row.Status);
@@ -626,13 +551,6 @@ namespace Pepperi.SDK.Endpoints.Base
         {
             return this.IpaasBaseUri + path;
         }
-
         #endregion
-    }
-
-    public class GenericIpaasResponse<TData>
-    {
-        public TData Data { get; set; }
-        public object BaseException { get; set; }
     }
 }

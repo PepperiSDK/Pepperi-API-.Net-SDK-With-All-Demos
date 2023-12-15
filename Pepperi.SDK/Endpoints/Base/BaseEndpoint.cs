@@ -619,6 +619,11 @@ namespace Pepperi.SDK.Endpoints.Base
         public BulkUploadResponse BulkUpload(string csvFilePath, eOverwriteMethod OverwriteMethod, Encoding fileEncoding, string SubTypeID = "", string FilePathToStoreZipFile = null)
         {
             byte[] fileAsBinary = File.ReadAllBytes(csvFilePath);
+            return BulkUpload(fileAsBinary, OverwriteMethod, fileEncoding, SubTypeID, FilePathToStoreZipFile);
+        }
+
+        public BulkUploadResponse BulkUpload(byte[] fileAsBinary, eOverwriteMethod OverwriteMethod, Encoding fileEncoding, string SubTypeID = "", string FilePathToStoreZipFile = null)
+        {
             bool isToAddBOM = true;
             // UTF8 byte order mark is: 0xEF,0xBB,0xBF
             if (fileAsBinary[0] == 0xEF && fileAsBinary[1] == 0xBB && fileAsBinary[2] == 0xBF)

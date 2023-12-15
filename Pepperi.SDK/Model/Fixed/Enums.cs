@@ -42,7 +42,7 @@ namespace Pepperi.SDK.Model.Fixed
         Paid = 19,                  // read only – payment made succesfully
     }
 
-    
+
     public enum eUiControlType
     {
         TextBox = 1,
@@ -79,7 +79,7 @@ namespace Pepperi.SDK.Model.Fixed
     }
 
     public enum ePepperiAuditLogStatus
-    {   
+    {
         Failure = 0,
         Success = 1,
         InProgress = 2,
