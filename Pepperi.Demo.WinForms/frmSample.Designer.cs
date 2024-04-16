@@ -81,6 +81,7 @@
             this.btnSaveAll = new System.Windows.Forms.Button();
             this.ipaasJobsTab = new System.Windows.Forms.TabControl();
             this.SaveAndUseToken_Button = new System.Windows.Forms.Button();
+            this.MultipleFilesSelector = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.otherTab.SuspendLayout();
             this.OtherTabControl.SuspendLayout();
@@ -469,7 +470,7 @@
             // 
             this.ExportDataFile.Location = new System.Drawing.Point(170, 21);
             this.ExportDataFile.Name = "ExportDataFile";
-            this.ExportDataFile.Size = new System.Drawing.Size(102, 51);
+            this.ExportDataFile.Size = new System.Drawing.Size(102, 52);
             this.ExportDataFile.TabIndex = 18;
             this.ExportDataFile.Text = "Export Data (File)";
             this.ExportDataFile.UseVisualStyleBackColor = true;
@@ -677,6 +678,10 @@
             this.SaveAndUseToken_Button.UseVisualStyleBackColor = true;
             this.SaveAndUseToken_Button.Click += new System.EventHandler(this.SaveAndUseToken_Button_Click);
             // 
+            // MultipleFilesSelector
+            // 
+            this.MultipleFilesSelector.Multiselect = true;
+            // 
             // frmSample
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -772,6 +777,7 @@
         private System.Windows.Forms.Button RelatedItems_ExportAsyncButton;
         private System.Windows.Forms.Button RelatedItems_UploadFile_Button;
         private System.Windows.Forms.Button SaveAndUseToken_Button;
+        private System.Windows.Forms.OpenFileDialog MultipleFilesSelector;
     }
 }
 

@@ -53,6 +53,12 @@
     <Compile Include="frmSample.Designer.cs">
       <DependentUpon>frmSample.cs</DependentUpon>
     </Compile>
+    <Compile Include="General Forms\GenericConfirmForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="General Forms\GenericConfirmForm.Designer.cs">
+      <DependentUpon>GenericConfirmForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="General Forms\GenericJsonResponseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -170,6 +176,9 @@
     <EmbeddedResource Include="frmSample.resx">
       <DependentUpon>frmSample.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="General Forms\GenericConfirmForm.resx">
+      <DependentUpon>GenericConfirmForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="General Forms\GenericResourcesForms\GR_ExportFileConfiguration.resx">
       <DependentUpon>GR_ExportFileConfiguration.cs</DependentUpon>
     </EmbeddedResource>
@@ -221,6 +230,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="User Defined Collections Forms\udcSchemeSelectorForm.resx">
       <DependentUpon>udcSchemeSelectorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User Defined Collections Forms\udcUploadConfigurationForm.resx">
+      <DependentUpon>udcUploadConfigurationForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -123,6 +123,7 @@
     <Compile Include="Model\Contact.cs" />
     <Compile Include="Model\Fixed\BulkUploadResponse.cs" />
     <Compile Include="Model\Fixed\Enums.cs" />
+    <Compile Include="Model\Fixed\BulkMultiPartImport.cs" />
     <Compile Include="Model\Fixed\ExportAsyncRequest.cs" />
     <Compile Include="Model\Fixed\ExportAsyncResponse.cs" />
     <Compile Include="Model\Fixed\FieldMetadata.cs" />

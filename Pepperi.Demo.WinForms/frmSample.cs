@@ -22,6 +22,7 @@ using WinFormApiDemo.PepperiResoursesForms.Journeys;
 using WinFormApiDemo.Surveys_Forms;
 using WinFormApiDemo.User_Defined_Collections_Forms;
 using WinFormApiDemo.Helpers;
+using WindowsFormsApp1.General_Forms;
 
 namespace WindowsFormsApp1
 {
@@ -279,6 +280,7 @@ namespace WindowsFormsApp1
 
             var overwrite = false;
             var overwriteObject = false;
+            var multiFilesOverwrite = false;
             using (var configForm = new udcUploadConfigurationForm())
             {
                 if (configForm.ShowDialog() != DialogResult.OK)
@@ -287,8 +289,10 @@ namespace WindowsFormsApp1
                 };
                 overwrite = configForm.Overwrite;
                 overwriteObject = configForm.OverwriteObject;
+                multiFilesOverwrite = configForm.MultiFilesOverwrite;
             }
 
+            UDC_MultiFilesOverwriteFinish_Result finishResult = null;
             openFileDialog1.ShowDialog();
             string file = openFileDialog1.FileName;
             if (file != "openFileDialog1" && schecma != "")
@@ -300,7 +304,18 @@ namespace WindowsFormsApp1
                 Application.DoEvents();
                 try
                 {
-                    response = client.UserDefinedCollections.BulkUploadFile(schecma, file, overwriteObject, overwrite);
+                    string multiFilesOverwriteKey = null;
+                    if (multiFilesOverwrite) {
+                        multiFilesOverwriteKey = client.UserDefinedCollections.StartMultiFilesOverwrite(schecma);
+                    }
+                    response = client.UserDefinedCollections.BulkUploadFile(
+                        schecma, file, overwriteObject, overwrite, multiFilesOverwriteKey: multiFilesOverwriteKey);
+
+                    if (multiFilesOverwrite)
+                    {
+                        finishResult = client.UserDefinedCollections.FinishMultiFilesOverwrite(schecma, multiFilesOverwriteKey);
+                    }
+
                     pleaseWait.Close();
                 }
                 catch (Exception ex)
@@ -324,12 +339,16 @@ namespace WindowsFormsApp1
                 }
 
                 MessageBox.Show(message + Environment.NewLine
-                    + "Total:  " + response.Total + Environment.NewLine
-                    + "Inserted:  " + response.TotalInserted + Environment.NewLine
-                    + "Updated:  " + response.TotalUpdated + Environment.NewLine
-                    + "Ignored:  " + response.TotalIgnored + Environment.NewLine
-                    + "Merged:  " + response.TotalMergedBeforeUpload + Environment.NewLine
-                    + "Failed:  " + response.TotalFailed);
+                        + "Total:  " + response.Total + Environment.NewLine
+                        + "Inserted:  " + response.TotalInserted + Environment.NewLine
+                        + "Updated:  " + response.TotalUpdated + Environment.NewLine
+                        + "Ignored:  " + response.TotalIgnored + Environment.NewLine
+                        + "Merged:  " + response.TotalMergedBeforeUpload + Environment.NewLine
+                        + "Failed:  " + response.TotalFailed);
+
+                if (finishResult != null) {
+                    MessageBox.Show("Result from Multi Files Overwrite: " + PrettyJson(finishResult));
+                }
             }
             else
             {

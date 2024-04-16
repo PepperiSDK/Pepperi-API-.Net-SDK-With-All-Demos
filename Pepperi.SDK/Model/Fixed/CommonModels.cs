@@ -40,6 +40,7 @@ namespace Pepperi.SDK.Model.Fixed
         public string URI { get; set; }
         public bool? OverwriteObject { get; set; }
         public bool? OverwriteTable { get; set; }
+        public string MultipartOverwriteKey { get; set; }
     }
 
     public class UDC_Base_Row
@@ -67,6 +68,22 @@ namespace Pepperi.SDK.Model.Fixed
     {
         public string Key { get; set; }
         public string Status { get; set; } // Update, Ignore, Insert
+    }
+
+    public class UDC_MultiFilesOverwriteFinish_Result
+    {
+
+        public UDC_MultiFilesOverwriteFinish_Result_Statistics Statistics { get; set; }
+    }
+
+    public class UDC_MultiFilesOverwriteFinish_Result_Statistics
+    {
+        public int SourcePagesCount { get; set; }
+        public int SourceObjectsCount { get; set; }
+        public float TargetTimeInSeconds { get; set; }
+        public float SourceTimeInSeconds { get; set; }
+        public float SourceSizeInKB { get; set; }
+
     }
 
     #endregion

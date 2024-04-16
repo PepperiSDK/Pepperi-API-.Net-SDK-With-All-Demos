@@ -8,30 +8,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WinFormApiDemo.User_Defined_Collections_Forms
+namespace WindowsFormsApp1.General_Forms
 {
-    public partial class udcUploadConfigurationForm : Form
+    public partial class GenericConfirmForm : Form
     {
-        public bool OverwriteObject { get; set; } = false;
-        public bool Overwrite { get; set; } = false;
-        public bool MultiFilesOverwrite { get; set; } = false;
-
-        public udcUploadConfigurationForm()
+        public GenericConfirmForm(string text = "Are you sure?")
         {
             InitializeComponent();
+            this.BasicTextLabel.Text = text;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
+        public void SetBasicText(string text) {
+            this.BasicTextLabel.Text = text;
         }
 
         private void NextButton_Click(object sender, EventArgs e)
         {
-            this.Overwrite = this.overwriteCheckBox.Checked;
-            this.OverwriteObject = this.overwriteObjectCheckBox.Checked;
-            this.MultiFilesOverwrite = this.MultiFilesOverwriteCheckbox.Checked;
-
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
         }

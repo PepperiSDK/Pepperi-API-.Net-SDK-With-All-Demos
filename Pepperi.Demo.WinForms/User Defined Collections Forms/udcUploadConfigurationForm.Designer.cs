@@ -33,12 +33,13 @@
             this.NextButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
             this.udcNameLabel = new System.Windows.Forms.Label();
+            this.MultiFilesOverwriteCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // overwriteObjectCheckBox
             // 
             this.overwriteObjectCheckBox.AutoSize = true;
-            this.overwriteObjectCheckBox.Location = new System.Drawing.Point(82, 62);
+            this.overwriteObjectCheckBox.Location = new System.Drawing.Point(82, 42);
             this.overwriteObjectCheckBox.Name = "overwriteObjectCheckBox";
             this.overwriteObjectCheckBox.Size = new System.Drawing.Size(144, 24);
             this.overwriteObjectCheckBox.TabIndex = 2;
@@ -49,7 +50,7 @@
             // overwriteCheckBox
             // 
             this.overwriteCheckBox.AutoSize = true;
-            this.overwriteCheckBox.Location = new System.Drawing.Point(82, 92);
+            this.overwriteCheckBox.Location = new System.Drawing.Point(82, 72);
             this.overwriteCheckBox.Name = "overwriteCheckBox";
             this.overwriteCheckBox.Size = new System.Drawing.Size(137, 24);
             this.overwriteCheckBox.TabIndex = 3;
@@ -84,11 +85,22 @@
             this.udcNameLabel.Size = new System.Drawing.Size(0, 20);
             this.udcNameLabel.TabIndex = 6;
             // 
+            // MultiFilesOverwriteCheckbox
+            // 
+            this.MultiFilesOverwriteCheckbox.AutoSize = true;
+            this.MultiFilesOverwriteCheckbox.Location = new System.Drawing.Point(82, 102);
+            this.MultiFilesOverwriteCheckbox.Name = "MultiFilesOverwriteCheckbox";
+            this.MultiFilesOverwriteCheckbox.Size = new System.Drawing.Size(168, 24);
+            this.MultiFilesOverwriteCheckbox.TabIndex = 7;
+            this.MultiFilesOverwriteCheckbox.Text = "Multi Files Overwrite";
+            this.MultiFilesOverwriteCheckbox.UseVisualStyleBackColor = true;
+            // 
             // udcUploadConfigurationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(318, 227);
+            this.Controls.Add(this.MultiFilesOverwriteCheckbox);
             this.Controls.Add(this.udcNameLabel);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.NextButton);
@@ -111,5 +123,6 @@
         private System.Windows.Forms.Button NextButton;
         private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Label udcNameLabel;
+        private System.Windows.Forms.CheckBox MultiFilesOverwriteCheckbox;
     }
 }
