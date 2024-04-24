@@ -182,9 +182,10 @@ namespace Pepperi.ModelGenerator
 
             foreach (eModelClassName ClassName in Enum.GetValues(typeof(eModelClassName)))
             {
+                string ClassNameAsString = ClassName.ToString();
+                Console.WriteLine($"Generating model for \"{ClassNameAsString}\"...");
                 IEnumerable<Field_MetaData> Fields_MetaData = GetFieldsMetadataByClassName(ClassName);
                 List<string> HardCodedFields = ModelClassNameToHardCodedFields[ClassName];
-                string ClassNameAsString = ClassName.ToString();
                 string ClassCode = GenerateClassCode(modelNamespace, ClassNameAsString, Fields_MetaData, HardCodedFields, generateCustomFields);
                 string FileName = ClassNameAsString + ".cs";
                 fileName_To_ClassCode.Add(FileName, ClassCode);
@@ -551,16 +552,6 @@ namespace Pepperi.ModelGenerator
                 {
                     UIType = Field_MetaData.UIType.ID;
                 }
-                string Reference = null;
-                if (Field_MetaData != null
-                            && Field_MetaData.TypeSpecificFields != null
-                            && Field_MetaData.TypeSpecificFields.ReferenceToResourceType != null
-                    )
-                {
-                    Reference = Field_MetaData.TypeSpecificFields.ReferenceToResourceType;
-                }
-
-
 
                 if (generateCustomFields == false && Name.Contains("TSA"))
                 {
@@ -570,7 +561,7 @@ namespace Pepperi.ModelGenerator
 
                 if (DataType.Trim().Length == 0 || UIType == 45)    //UiType=45 is for 1 to many relations
                 {
-                    sbReport.AppendFormat("No data type for class {0} DataType={1} Name= {2} UIType={3} \r\n",
+                    sbReport.AppendFormat("No data type for class \"{0}\" DataType=\"{1}\" Name=\"{2}\" UIType=\"{3}\" \r\n",
                         clasName,
                         DataType == null ? "null" : DataType,
                         Name == null ? "null" : Name,
@@ -591,7 +582,7 @@ namespace Pepperi.ModelGenerator
                 else
                 {
                     //add? for the types that are not string 
-                    string nullableValue = DataType.ToLower() != "string" ? "?" : string.Empty;
+                    string nullableValue = GetNullableValue(DataType);
                     sbCode.AppendLine("\t\t public " + DataType + nullableValue + " " + Name + " \t{get; set; }");  //eg, publc int? Ammount { get; set; }
                 }
             }
@@ -617,14 +608,22 @@ namespace Pepperi.ModelGenerator
             #endregion
 
 
-            Console.WriteLine(sbReport.ToString());
+            var log = sbReport.ToString();
+            if (!string.IsNullOrEmpty(log)) {
+                Console.WriteLine(log);
+            }
 
             string classSourceCode = sbCode.ToString();
             return classSourceCode;
-
-
         }
 
+        private string GetNullableValue(string dataType)
+        {
+
+            var isNullable = dataType.ToLower() != "string" && !dataType.EndsWith("[]");
+
+            return isNullable ? "?" : string.Empty;
+        }
         private void SaveFile(string outputDirectory, string fileText, string fileName)
         {
             string path = Path.Combine(outputDirectory, fileName);

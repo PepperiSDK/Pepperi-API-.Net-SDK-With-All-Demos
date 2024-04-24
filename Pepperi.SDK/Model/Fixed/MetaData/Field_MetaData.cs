@@ -80,8 +80,8 @@ namespace Pepperi.SDK.Model.Fixed.MetaData
 
         public string ProgramReference { get; set; }
         public string TransactionLinesSumFieldID { get; set; }
-        public string ReferenceToResourceType { get; set; }
-        public Field_TypeSpecificFields_ReferenceTo ReferenceTo { get; set; }
+        public long? ReferenceTo { get; set; }
+        public Field_TypeSpecificFields_ReferenceToResourceType ReferenceToResourceType { get; set; }
 
         public string PickListResourceType { get; set; }
 
@@ -90,15 +90,12 @@ namespace Pepperi.SDK.Model.Fixed.MetaData
         public string ReadOnlyDisplayValue { get; set; }
 
     }
-
-
-
-
-    public class Field_TypeSpecificFields_ReferenceTo
+    
+    public class Field_TypeSpecificFields_ReferenceToResourceType
     {
-        public string ExternalID { get; set; }
+        public long? ID { get; set; }
 
-        public Guid? UUID { get; set; }
+        public string Name { get; set; }
     }
 
     public class Field_CalculatedOn
