@@ -39,7 +39,7 @@ namespace Pepperi.ModelGenerator
 
             bool ShouldGenerateCustomFields = Ask_ShouldGenerateCustomFields();
             bool ShouldGenerateUDC = Ask_ShouldGenerateUDC();
-
+            
             ModelGenerator ModelGenerator = new ModelGenerator(ApiClient);
             ModelGenerator.GenerateModelsCode("Pepperi.SDK.Model", ModelDirectory, ShouldGenerateCustomFields, ShouldGenerateUDC);
 

@@ -35,30 +35,95 @@ namespace Pepperi.SDK.Endpoints.Fixed
 
         #region Search
 
-        public IEnumerable<JourneyFile> SearchFiles(string where = null)
+        #region Files
+
+        /// <summary>
+        /// Method supports paging with pageKey. First request should be with null/empty "pageKey" param. Result can contain "NextPageKey" property value. 
+        /// If it doesn't - there are no other pages. If it does - you can access next page by passing "NextPageKey" value to "pageKey" param and calling method again.
+        /// </summary>
+        /// <param name="where"></param>
+        /// <param name="pageKey"></param>
+        /// <returns></returns>
+        public SearchJourneyFilesResult SearchFiles(string where = null, string pageKey = null)
         {
-            var response = SearchFilesRequest(where);
-            var files = PepperiJsonSerializer.DeserializeCollection<JourneyFile>(response.Body);
+            var response = SearchFilesRequest(where, pageKey);
+            var result = PepperiJsonSerializer.DeserializeOne<SearchJourneyFilesResult>(response.Body);
 
-            ValuesValidator.Validate(files != null, "Response Files are null!");
+            ValuesValidator.Validate(result, "Response is null!");
+            ValuesValidator.Validate(result.Objects, "Response files are null!");
 
-            return files;
+            return result;
         }
 
-        public SearchJourneysResult<dynamic> SearchJourneys(string where = null)
-        {
-            var files = SearchFiles(where);
 
-            var journeys = GetJourneysFromFiles<dynamic>(files);
+        public IEnumerable<JourneyFile> SearchAllFiles(string where = null, int timeoutMinutes = 300)
+        {
+            Logger.Log("Search All Files started!");
+
+            var timeoutDateTime = DateTime.UtcNow.AddMinutes(timeoutMinutes);
+            //var maxPageSize = 100;
+            var finalResult = new List<JourneyFile>();
+
+            Logger.Log($"Where clause: \"{where}\", timeoutMinutes: {timeoutMinutes}");
+
+            var pageKey = string.Empty;
+            var shouldStop = false;
+            while (!shouldStop) {
+                var searchResult = SearchFiles(where, pageKey);
+
+                pageKey = searchResult.NextPageKey;
+
+                finalResult.AddRange(searchResult.Objects);
+
+                shouldStop = string.IsNullOrEmpty(pageKey);
+
+                // If we already have done paging
+                if (!shouldStop) {
+                    var timeoutWasExceeded = DateTime.UtcNow > timeoutDateTime;
+                    ValuesValidator.Validate(!timeoutWasExceeded, $"Timeout of {timeoutMinutes} minutes was exceeded!", false);
+                }
+            }
+
+            Logger.Log($"Search all files finished. Total Journey files count: {finalResult.Count()}");
+            return finalResult;
+        }
+
+        #endregion
+
+        public SearchJourneysResult<dynamic> SearchJourneys(string where = null, string pageKey = null)
+        {
+            var searchFilesResult = SearchFiles(where, pageKey);
+
+            var journeys = GetJourneysFromFiles<dynamic>(searchFilesResult.Objects);
+            journeys.NextPageKey = searchFilesResult.NextPageKey;
 
             return journeys;
         }
 
-        public SearchJourneysResult<TData> SearchJourneys<TData>(string where = null)
+        public SearchJourneysResult<TData> SearchJourneys<TData>(string where = null, string pageKey = null)
         {
-            var files = SearchFiles(where);
+            var searchFilesResult = SearchFiles(where, pageKey);
 
-            var journeys = GetJourneysFromFiles<TData>(files);
+            var journeys = GetJourneysFromFiles<TData>(searchFilesResult.Objects);
+            journeys.NextPageKey = searchFilesResult.NextPageKey;
+
+            return journeys;
+        }
+
+        public SearchJourneysResult<dynamic> SearchAllJourneys(string where = null, int timeoutMinutes = 300)
+        {
+            var searchFilesResult = SearchAllFiles(where, timeoutMinutes);
+
+            var journeys = GetJourneysFromFiles<dynamic>(searchFilesResult);
+
+            return journeys;
+        }
+
+        public SearchJourneysResult<TData> SearchAllJourneys<TData>(string where = null, int timeoutMinutes = 300)
+        {
+            var searchFilesResult = SearchAllFiles(where, timeoutMinutes);
+
+            var journeys = GetJourneysFromFiles<TData>(searchFilesResult);
 
             return journeys;
         }
@@ -137,12 +202,18 @@ namespace Pepperi.SDK.Endpoints.Fixed
 
         #region Requests
 
-        private PepperiHttpClientResponse SearchFilesRequest(string where)
+        private PepperiHttpClientResponse SearchFilesRequest(string where, string pageKey = null, int? pageSize = null)
         {
             var url = $"files/search";
-            var body = new Dictionary<string, string>() { };
+            var body = new Dictionary<string, object>() { };
 
             if (!string.IsNullOrEmpty(where)) body["Where"] = where;
+            if (!string.IsNullOrEmpty(pageKey)) body["PageKey"] = pageKey;
+
+            if (pageSize.HasValue) {
+                ValuesValidator.Validate(pageSize.Value > 0, $"Page size should be > 0, but got {pageSize.Value}!");
+                body["PageSize"] = pageSize.Value;
+            }
 
             return PostResourseApi(url, PepperiJsonSerializer.Serialize(body));
         }

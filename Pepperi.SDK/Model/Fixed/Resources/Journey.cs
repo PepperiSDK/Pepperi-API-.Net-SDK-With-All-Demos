@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace Pepperi.SDK.Model.Fixed.Resources
 {
+    public class SearchJourneyFilesResult
+    {
+        public string NextPageKey { get; set; }
+        public IEnumerable<JourneyFile> Objects { get; set; }
+    }
     public class JourneyFile
     {
         public DateTime? ModificationDateTime { get; set; }
@@ -66,6 +71,7 @@ namespace Pepperi.SDK.Model.Fixed.Resources
 
     public class SearchJourneysResult<TData>
     {
+        public string NextPageKey { get; set; }
         public IEnumerable<Journey<TData>> Journeys { get; set; }
         public IEnumerable<SearchJourneysResult_FailedFiles> FailedFiles { get; set; }
 
