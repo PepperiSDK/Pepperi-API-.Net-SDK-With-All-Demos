@@ -38,6 +38,7 @@
             this.ExcludeKeysTextBox = new System.Windows.Forms.TextBox();
             this.CancelButton = new System.Windows.Forms.Button();
             this.NextButton = new System.Windows.Forms.Button();
+            this.IncludeDeletedCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // FormatListBox
@@ -133,11 +134,22 @@
             this.NextButton.UseVisualStyleBackColor = true;
             this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
             // 
+            // IncludeDeletedCheckbox
+            // 
+            this.IncludeDeletedCheckbox.AutoSize = true;
+            this.IncludeDeletedCheckbox.Location = new System.Drawing.Point(17, 220);
+            this.IncludeDeletedCheckbox.Name = "IncludeDeletedCheckbox";
+            this.IncludeDeletedCheckbox.Size = new System.Drawing.Size(170, 29);
+            this.IncludeDeletedCheckbox.TabIndex = 12;
+            this.IncludeDeletedCheckbox.Text = "Include deleted";
+            this.IncludeDeletedCheckbox.UseVisualStyleBackColor = true;
+            // 
             // udcExportFileConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 277);
+            this.Controls.Add(this.IncludeDeletedCheckbox);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.NextButton);
             this.Controls.Add(this.label4);
@@ -170,5 +182,6 @@
         private System.Windows.Forms.TextBox ExcludeKeysTextBox;
         private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Button NextButton;
+        private System.Windows.Forms.CheckBox IncludeDeletedCheckbox;
     }
 }

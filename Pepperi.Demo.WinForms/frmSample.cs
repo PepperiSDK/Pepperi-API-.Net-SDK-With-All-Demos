@@ -475,6 +475,7 @@ namespace WindowsFormsApp1
             var where = udcExportFileConfiguration.Where;
             var format = udcExportFileConfiguration.Format;
             var excludedKeys = udcExportFileConfiguration.ExcludedKeys;
+            var includeDeleted = udcExportFileConfiguration.IncludeDeleted;
 
             var fodlerSelectionResult = folderBrowserDialog1.ShowDialog();
             if (fodlerSelectionResult != DialogResult.OK)
@@ -494,7 +495,8 @@ namespace WindowsFormsApp1
                     format: format,
                     where: where,
                     fields: fields,
-                    excludedKeys: excludedKeys);
+                    excludedKeys: excludedKeys,
+                    includeDeleted: includeDeleted);
                 pleaseWait.Close();
                 MessageBox.Show($"File was exported! File name - '{newFileName}' ({fullFilePath})");
             }

@@ -56,6 +56,7 @@ namespace Pepperi.SDK.Model.Fixed
         public string Fields { get; set; }
         public string Delimiter { get; set; }
         public IEnumerable<string> ExcludedKeys { get; set; }
+        public bool IncludeDeleted { get; set; }
     }
 
     public class UDC_ImportData_Request<TData>

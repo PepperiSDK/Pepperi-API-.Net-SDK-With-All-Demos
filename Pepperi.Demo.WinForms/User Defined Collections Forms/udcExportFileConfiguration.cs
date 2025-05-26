@@ -39,7 +39,7 @@ namespace WinFormApiDemo.User_Defined_Collections_Forms
             var where = this.WhereTextBox.Text;
             var format = (string)this.FormatListBox.SelectedItem;
             var excludedKeys = this.ExcludeKeysTextBox.Text;
-            //var includeDeleted = this.IncludeDeletedCheckbox.Checked;
+            var includeDeleted = this.IncludeDeletedCheckbox.Checked;
 
             if (string.IsNullOrWhiteSpace(format)) {
                 MessageBox.Show("Select Extension please!");
@@ -56,7 +56,7 @@ namespace WinFormApiDemo.User_Defined_Collections_Forms
             this.Where = string.IsNullOrWhiteSpace(where) ? null : where;
             this.Format = format == "CSV" ? "csv" : "json";
             this.ExcludedKeys = string.IsNullOrWhiteSpace(excludedKeys) ? null : excludedKeys.Split(',');
-            //this.IncludeDeleted = includeDeleted;
+            this.IncludeDeleted = includeDeleted;
 
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
